@@ -1,50 +1,166 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Unisegura Demo</title>
+    <title>UniSegura - Mantente seguro</title>
     <style>
-        body { font-family: Arial; text-align: center; padding: 20px; }
-        .seguro { color: green; }
-        .alerta { color: red; font-weight: bold; }
-        button { padding: 10px 20px; margin: 10px; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-weight: normal;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+        
+        .panic-button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 30px auto;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .panic-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .panic-button:active {
+            transform: scale(0.95);
+        }
+        
+        .features {
+            text-align: left;
+            margin: 30px 0;
+            padding: 0;
+            list-style-type: none;
+        }
+        
+        .features li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .features li:before {
+            content: "•";
+            color: #e74c3c;
+            font-weight: bold;
+            display: inline-block;
+            width: 20px;
+            margin-left: -20px;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .safe {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .alert {
+            background-color: #e74c3c;
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .hidden-alarm {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <h1>🔒 Unisegura DEMO</h1>
-    <p>Prueba cómo funciona nuestro sistema de seguridad.</p>
+    <h1>UniSegura</h1>
+    <p class="subtitle">Mantente seguro</p>
     
-    <div id="estado">
-        <p>Estado: <span id="status">Seguro</span></p>
-    </div>
+    <div id="status-display" class="status safe">Sistema seguro</div>
     
-    <button onclick="simularAlerta()">Simular Alerta</button>
-    <button onclick="reiniciar()">Reiniciar Sistema</button>
+    <button id="panic-button" class="panic-button">
+        <span>BOTÓN DE</span>
+        <span>PÁNICO</span>
+    </button>
     
-    <!-- 🔊 Audio de alarma (oculto) -->
-    <audio id="alarma" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3"></audio>
+    <ul class="features">
+        <li>Presiona el botón de pánico</li>
+        <li>Alarma silenciosa</li>
+        <li>Envío de alerta especializada</li>
+    </ul>
+    
+    <!-- Audio para la alarma silenciosa (inicialmente oculto) -->
+    <audio id="alarm-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" loop></audio>
     
     <script>
-        const alarma = document.getElementById("alarma");
+        const panicButton = document.getElementById('panic-button');
+        const statusDisplay = document.getElementById('status-display');
+        const alarmSound = document.getElementById('alarm-sound');
         
-        function simularAlerta() {
-            document.getElementById("status").textContent = "¡AMENAZA DETECTADA!";
-            document.getElementById("status").className = "alerta";
-            alarma.loop = true; // Repetir hasta que se desactive
-            alarma.play(); // 🔊 Suena la alarma
-            alert("⚠️ ¡Alerta de seguridad activada!");
-            
-            // Temporizador de desactivación automática (opcional)
-            setTimeout(() => {
-                reiniciar();
-            }, 10000); // Se apaga después de 10 segundos
-        }
+        let alarmActive = false;
         
-        function reiniciar() {
-            document.getElementById("status").textContent = "Seguro";
-            document.getElementById("status").className = "seguro";
-            alarma.pause(); // 🔇 Silenciar alarma
-            alarma.currentTime = 0; // Reiniciar el audio
-        }
+        panicButton.addEventListener('click', function() {
+            if (!alarmActive) {
+                // Activar alarma
+                alarmActive = true;
+                statusDisplay.textContent = "ALERTA ACTIVADA!";
+                statusDisplay.className = "status alert";
+                alarmSound.play();
+                
+                // Simular envío de alerta
+                setTimeout(() => {
+                    alert("Alerta enviada a las autoridades correspondientes");
+                }, 1500);
+                
+                // Cambiar texto del botón
+                panicButton.innerHTML = '<span>CANCELAR</span><span>ALERTA</span>';
+                panicButton.style.backgroundColor = "#3498db";
+            } else {
+                // Desactivar alarma
+                alarmActive = false;
+                statusDisplay.textContent = "Sistema seguro";
+                statusDisplay.className = "status safe";
+                alarmSound.pause();
+                alarmSound.currentTime = 0;
+                
+                // Restaurar botón
+                panicButton.innerHTML = '<span>BOTÓN DE</span><span>PÁNICO</span>';
+                panicButton.style.backgroundColor = "#e74c3c";
+            }
+        });
     </script>
 </body>
 </html>
