@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Unisegura Demo</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 20px; }
+        .seguro { color: green; }
+        .alerta { color: red; font-weight: bold; }
+        button { padding: 10px 20px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🔒 Unisegura DEMO</h1>
+    <p>Prueba cómo funciona nuestro sistema de seguridad.</p>
+    
+    <div id="estado">
+        <p>Estado: <span id="status">Seguro</span></p>
+    </div>
+    
+    <button onclick="simularAlerta()">Simular Alerta</button>
+    <button onclick="reiniciar()">Reiniciar Sistema</button>
+    
+    <script>
+        function simularAlerta() {
+            document.getElementById("status").textContent = "¡AMENAZA DETECTADA!";
+            document.getElementById("status").className = "alerta";
+            alert("⚠️ ¡Alerta de seguridad activada!");
+        }
+        
+        function reiniciar() {
+            document.getElementById("status").textContent = "Seguro";
+            document.getElementById("status").className = "seguro";
+        }
+    </script>
+</body>
+</html>
