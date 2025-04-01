@@ -11,6 +11,7 @@
             --blanco: #FFFFFF;
             --rojo-emergencia: #FF4500;
             --gris-oscuro: #36454F;
+            --gris-claro: #F5F5F5;
         }
         
         * {
@@ -21,7 +22,7 @@
         }
         
         body {
-            background: #F5F5F5;
+            background: var(--gris-claro);
             color: #333;
             height: 100vh;
             overflow: hidden;
@@ -62,6 +63,21 @@
             height: calc(100vh - 180px);
             padding: 1rem;
             overflow-y: auto;
+        }
+        
+        /* Páginas (secciones) */
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         /* Tarjeta de estado */
@@ -170,7 +186,7 @@
             100% { transform: scale(0.8); opacity: 0; }
         }
         
-        /* Barra de navegación */
+        /* Barra de navegación MEJORADA */
         .nav-bar {
             position: fixed;
             bottom: 0;
@@ -190,15 +206,119 @@
             align-items: center;
             color: #777;
             font-size: 0.8rem;
+            text-decoration: none;
+            width: 25%;
         }
         
         .nav-item.active {
             color: var(--verde-bosque);
+            position: relative;
+        }
+        
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            width: 30px;
+            height: 3px;
+            background: var(--verde-bosque);
+            border-radius: 3px;
         }
         
         .nav-icon {
             font-size: 1.4rem;
             margin-bottom: 0.3rem;
+            transition: all 0.3s;
+        }
+        
+        .nav-item.active .nav-icon {
+            transform: translateY(-5px);
+        }
+        
+        /* Estilos para la página de reportes */
+        .report-card {
+            background: var(--blanco);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--verde-bosque);
+        }
+        
+        .report-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .report-date {
+            color: #777;
+            font-size: 0.8rem;
+        }
+        
+        /* Estilos para la página de alertas */
+        .alert-item {
+            background: var(--blanco);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--rojo-emergencia);
+            display: flex;
+            align-items: center;
+        }
+        
+        .alert-icon {
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            color: var(--rojo-emergencia);
+        }
+        
+        /* Estilos para la página de perfil */
+        .profile-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--verde-bosque);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+        }
+        
+        .profile-info {
+            background: var(--blanco);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .info-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-size: 0.8rem;
+            color: #777;
+        }
+        
+        .info-value {
+            font-weight: 500;
         }
         
         /* Modal de emergencia */
@@ -307,38 +427,141 @@
         <p>Seguridad integral para nuestra comunidad</p>
     </div>
     
-    <!-- Contenido principal -->
+    <!-- Contenido principal - Páginas -->
     <div class="main-content">
-        <!-- Tarjeta de estado -->
-        <div class="status-card">
-            <div class="status-title">Sistema de Seguridad Activo</div>
-            <div class="status-message">Conectado a la red de la Universidad El Bosque</div>
+        <!-- Página de Inicio -->
+        <div id="homePage" class="page active">
+            <div class="status-card">
+                <div class="status-title">Sistema de Seguridad Activo</div>
+                <div class="status-message">Conectado a la red de la Universidad El Bosque</div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn" onclick="openModal('security')">
+                    <span class="btn-icon">🛡️</span>
+                    <span class="btn-text">Seguridad</span>
+                </button>
+                <button class="action-btn" onclick="openModal('medical')">
+                    <span class="btn-icon">🚑</span>
+                    <span class="btn-text">Emergencia Médica</span>
+                </button>
+                <button class="action-btn" onclick="openModal('contacts')">
+                    <span class="btn-icon">👥</span>
+                    <span class="btn-text">Contactos</span>
+                </button>
+                <button class="action-btn" onclick="openModal('map')">
+                    <span class="btn-icon">🗺️</span>
+                    <span class="btn-text">Mapa del Campus</span>
+                </button>
+            </div>
+            
+            <div class="status-card" style="border-left-color: #FFA500;">
+                <div class="status-title">Prueba el sistema</div>
+                <div class="status-message">Presiona el botón rojo para simular una emergencia</div>
+            </div>
         </div>
         
-        <!-- Botones de acción -->
-        <div class="action-buttons">
-            <button class="action-btn" onclick="openModal('security')">
-                <span class="btn-icon">🛡️</span>
-                <span class="btn-text">Seguridad</span>
-            </button>
-            <button class="action-btn" onclick="openModal('medical')">
-                <span class="btn-icon">🚑</span>
-                <span class="btn-text">Emergencia Médica</span>
-            </button>
-            <button class="action-btn" onclick="openModal('contacts')">
-                <span class="btn-icon">👥</span>
-                <span class="btn-text">Contactos</span>
-            </button>
-            <button class="action-btn" onclick="openModal('map')">
-                <span class="btn-icon">🗺️</span>
-                <span class="btn-text">Mapa del Campus</span>
+        <!-- Página de Reportes -->
+        <div id="reportsPage" class="page">
+            <h3 style="margin-bottom: 1rem;">Mis Reportes</h3>
+            
+            <div class="report-card">
+                <div class="report-title">Incidente en Biblioteca</div>
+                <p>Reporté un comportamiento sospechoso cerca de la sección de referencia</p>
+                <div class="report-date">15 Mar 2023 - 14:30</div>
+            </div>
+            
+            <div class="report-card">
+                <div class="report-title">Accidente en Estacionamiento</div>
+                <p>Choque entre dos vehículos en el estacionamiento norte</p>
+                <div class="report-date">10 Mar 2023 - 08:45</div>
+            </div>
+            
+            <div class="report-card">
+                <div class="report-title">Fuga de Agua</div>
+                <p>Reporté una fuga de agua en el baño del edificio D</p>
+                <div class="report-date">5 Mar 2023 - 11:20</div>
+            </div>
+            
+            <button style="width: 100%; padding: 1rem; background: var(--verde-bosque); color: white; border: none; border-radius: 12px; margin-top: 1rem;">
+                + Nuevo Reporte
             </button>
         </div>
         
-        <!-- Notificación de prueba -->
-        <div class="status-card" style="border-left-color: #FFA500;">
-            <div class="status-title">Prueba el sistema</div>
-            <div class="status-message">Presiona el botón rojo para simular una emergencia</div>
+        <!-- Página de Alertas -->
+        <div id="alertsPage" class="page">
+            <h3 style="margin-bottom: 1rem;">Alertas Recientes</h3>
+            
+            <div class="alert-item">
+                <div class="alert-icon">⚠️</div>
+                <div>
+                    <div class="report-title">Alerta en Cafetería Central</div>
+                    <p>Se reportó un incidente - Evitar el área</p>
+                    <div class="report-date">Hace 15 minutos</div>
+                </div>
+            </div>
+            
+            <div class="alert-item">
+                <div class="alert-icon">⚠️</div>
+                <div>
+                    <div class="report-title">Corte de Energía</div>
+                    <p>Edificio B sin electricidad - En reparación</p>
+                    <div class="report-date">Hace 2 horas</div>
+                </div>
+            </div>
+            
+            <div class="alert-item">
+                <div class="alert-icon">⚠️</div>
+                <div>
+                    <div class="report-title">Mantenimiento Programado</div>
+                    <p>Ascensores fuera de servicio mañana de 8am a 12pm</p>
+                    <div class="report-date">Ayer - 16:30</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Página de Perfil -->
+        <div id="profilePage" class="page">
+            <div class="profile-header">
+                <div class="profile-avatar">JP</div>
+                <h3>Juan Pérez</h3>
+                <p>Estudiante de Ingeniería</p>
+            </div>
+            
+            <div class="profile-info">
+                <div class="info-item">
+                    <div class="info-label">Matrícula</div>
+                    <div class="info-value">20231045</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Correo</div>
+                    <div class="info-value">j.perez@estudiantes.uelbosque.edu.co</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Teléfono</div>
+                    <div class="info-value">+57 310 123 4567</div>
+                </div>
+            </div>
+            
+            <div class="profile-info">
+                <h4 style="margin-bottom: 1rem;">Contactos de Emergencia</h4>
+                <div class="info-item">
+                    <div class="info-label">María Gómez</div>
+                    <div class="info-value">Madre - 555 123 4567</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Carlos Pérez</div>
+                    <div class="info-value">Padre - 555 765 4321</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Seguridad UEB</div>
+                    <div class="info-value">555 987 6543</div>
+                </div>
+            </div>
+            
+            <button style="width: 100%; padding: 1rem; background: var(--gris-claro); color: var(--verde-bosque); border: 1px solid var(--verde-bosque); border-radius: 12px; margin-top: 1rem;">
+                Configuración
+            </button>
         </div>
     </div>
     
@@ -347,24 +570,24 @@
         <button class="panic-btn" onclick="activateEmergency()">🚨</button>
     </div>
     
-    <!-- Barra de navegación -->
+    <!-- Barra de navegación MEJORADA -->
     <div class="nav-bar">
-        <button class="nav-item active">
+        <a href="#" class="nav-item active" onclick="showPage('homePage')">
             <span class="nav-icon">🏠</span>
             <span>Inicio</span>
-        </button>
-        <button class="nav-item">
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('reportsPage')">
             <span class="nav-icon">📝</span>
             <span>Reportes</span>
-        </button>
-        <button class="nav-item">
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('alertsPage')">
             <span class="nav-icon">🔔</span>
             <span>Alertas</span>
-        </button>
-        <button class="nav-item">
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('profilePage')">
             <span class="nav-icon">👤</span>
             <span>Perfil</span>
-        </button>
+        </a>
     </div>
     
     <!-- Modal de emergencia -->
@@ -409,6 +632,26 @@
     <script>
         // Variables globales
         let emergencyActive = false;
+        
+        // Mostrar página específica
+        function showPage(pageId) {
+            // Ocultar todas las páginas
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Mostrar la página seleccionada
+            document.getElementById(pageId).classList.add('active');
+            
+            // Actualizar navegación
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Prevenir comportamiento por defecto del enlace
+            event.preventDefault();
+        }
         
         // Activar emergencia
         function activateEmergency() {
