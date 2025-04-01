@@ -20,16 +20,30 @@
     <button onclick="simularAlerta()">Simular Alerta</button>
     <button onclick="reiniciar()">Reiniciar Sistema</button>
     
+    <!-- 🔊 Audio de alarma (oculto) -->
+    <audio id="alarma" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3"></audio>
+    
     <script>
+        const alarma = document.getElementById("alarma");
+        
         function simularAlerta() {
             document.getElementById("status").textContent = "¡AMENAZA DETECTADA!";
             document.getElementById("status").className = "alerta";
+            alarma.loop = true; // Repetir hasta que se desactive
+            alarma.play(); // 🔊 Suena la alarma
             alert("⚠️ ¡Alerta de seguridad activada!");
+            
+            // Temporizador de desactivación automática (opcional)
+            setTimeout(() => {
+                reiniciar();
+            }, 10000); // Se apaga después de 10 segundos
         }
         
         function reiniciar() {
             document.getElementById("status").textContent = "Seguro";
             document.getElementById("status").className = "seguro";
+            alarma.pause(); // 🔇 Silenciar alarma
+            alarma.currentTime = 0; // Reiniciar el audio
         }
     </script>
 </body>
