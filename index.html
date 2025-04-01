@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UniSegura - El Bosque</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
             --verde-bosque: #2E8B57;
@@ -36,6 +37,7 @@
             text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             position: relative;
+            z-index: 1000;
         }
         
         .logo {
@@ -61,13 +63,13 @@
         /* Contenido principal */
         .main-content {
             height: calc(100vh - 180px);
-            padding: 1rem;
             overflow-y: auto;
         }
         
         /* Páginas (secciones) */
         .page {
             display: none;
+            padding: 1rem;
         }
         
         .page.active {
@@ -78,6 +80,15 @@
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
+        }
+        
+        /* Mapa del campus */
+        #campusMap {
+            height: 300px;
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
         
         /* Tarjeta de estado */
@@ -242,12 +253,39 @@
             padding: 1rem;
             margin-bottom: 1rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border-left: 4px solid var(--verde-bosque);
+        }
+        
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
         }
         
         .report-title {
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            color: var(--gris-oscuro);
+        }
+        
+        .report-status {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+        
+        .report-status.emergency {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+        
+        .report-location {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: #666;
+            font-size: 0.8rem;
+            margin: 0.3rem 0;
         }
         
         .report-date {
@@ -263,14 +301,31 @@
             margin-bottom: 1rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             border-left: 4px solid var(--rojo-emergencia);
-            display: flex;
-            align-items: center;
         }
         
-        .alert-icon {
-            margin-right: 1rem;
-            font-size: 1.5rem;
-            color: var(--rojo-emergencia);
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            color: var(--gris-oscuro);
+        }
+        
+        .alert-time {
+            color: #777;
+            font-size: 0.8rem;
+        }
+        
+        .alert-location {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: #666;
+            font-size: 0.8rem;
+            margin: 0.3rem 0;
         }
         
         /* Estilos para la página de perfil */
@@ -414,6 +469,24 @@
             from { top: 50px; opacity: 0; }
             to { top: 70px; opacity: 1; }
         }
+        
+        /* Mejoras para el mapa */
+        .map-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        
+        .map-overlay {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -436,6 +509,11 @@
                 <div class="status-message">Conectado a la red de la Universidad El Bosque</div>
             </div>
             
+            <div class="map-container">
+                <div id="campusMap"></div>
+                <div class="map-overlay">📍 Campus Principal - Universidad El Bosque</div>
+            </div>
+            
             <div class="action-buttons">
                 <button class="action-btn" onclick="openModal('security')">
                     <span class="btn-icon">🛡️</span>
@@ -449,9 +527,9 @@
                     <span class="btn-icon">👥</span>
                     <span class="btn-text">Contactos</span>
                 </button>
-                <button class="action-btn" onclick="openModal('map')">
-                    <span class="btn-icon">🗺️</span>
-                    <span class="btn-text">Mapa del Campus</span>
+                <button class="action-btn" onclick="showPage('alertsPage')">
+                    <span class="btn-icon">⚠️</span>
+                    <span class="btn-text">Alertas</span>
                 </button>
             </div>
             
@@ -463,24 +541,45 @@
         
         <!-- Página de Reportes -->
         <div id="reportsPage" class="page">
-            <h3 style="margin-bottom: 1rem;">Mis Reportes</h3>
+            <h3 style="margin-bottom: 1rem;">Reportes de Seguridad</h3>
             
             <div class="report-card">
-                <div class="report-title">Incidente en Biblioteca</div>
-                <p>Reporté un comportamiento sospechoso cerca de la sección de referencia</p>
-                <div class="report-date">15 Mar 2023 - 14:30</div>
+                <div class="report-header">
+                    <div class="report-title">Robo a mano armada</div>
+                    <div class="report-status emergency">URGENTE</div>
+                </div>
+                <div class="report-location">
+                    <span>📍</span>
+                    <span>Calle 134 con Autopista Norte (Fuera de campus)</span>
+                </div>
+                <p>Hombre armado robó pertenencias a estudiantes cerca de la estación de Transmilenio</p>
+                <div class="report-date">Hoy - 15:30 | Reportado por: Ana Martínez</div>
             </div>
             
             <div class="report-card">
-                <div class="report-title">Accidente en Estacionamiento</div>
-                <p>Choque entre dos vehículos en el estacionamiento norte</p>
-                <div class="report-date">10 Mar 2023 - 08:45</div>
+                <div class="report-header">
+                    <div class="report-title">Persona sospechosa</div>
+                    <div class="report-status">ACTIVO</div>
+                </div>
+                <div class="report-location">
+                    <span>📍</span>
+                    <span>Carrera 9 con Calle 131 (Parque frente a la U)</span>
+                </div>
+                <p>Individuo merodeando y tomando fotos a estudiantes desde hace 2 horas</p>
+                <div class="report-date">Ayer - 18:45 | Reportado por: Oficial de Seguridad</div>
             </div>
             
             <div class="report-card">
-                <div class="report-title">Fuga de Agua</div>
-                <p>Reporté una fuga de agua en el baño del edificio D</p>
-                <div class="report-date">5 Mar 2023 - 11:20</div>
+                <div class="report-header">
+                    <div class="report-title">Hurto de celulares</div>
+                    <div class="report-status">VIGENTE</div>
+                </div>
+                <div class="report-location">
+                    <span>📍</span>
+                    <span>Centro Comercial Santa Bárbara (Frente a la universidad)</span>
+                </div>
+                <p>Banda organizada robando celulares en el sector de comidas rápidas</p>
+                <div class="report-date">12/04/2023 - 12:20 | Reportado por: Carlos Gómez</div>
             </div>
             
             <button style="width: 100%; padding: 1rem; background: var(--verde-bosque); color: white; border: none; border-radius: 12px; margin-top: 1rem;">
@@ -490,33 +589,42 @@
         
         <!-- Página de Alertas -->
         <div id="alertsPage" class="page">
-            <h3 style="margin-bottom: 1rem;">Alertas Recientes</h3>
+            <h3 style="margin-bottom: 1rem;">Alertas de Seguridad</h3>
             
             <div class="alert-item">
-                <div class="alert-icon">⚠️</div>
-                <div>
-                    <div class="report-title">Alerta en Cafetería Central</div>
-                    <p>Se reportó un incidente - Evitar el área</p>
-                    <div class="report-date">Hace 15 minutos</div>
+                <div class="alert-header">
+                    <div class="alert-title">Robo violento en el sector</div>
+                    <div class="alert-time">Hace 25 min</div>
                 </div>
+                <div class="alert-location">
+                    <span>📍</span>
+                    <span>Carrera 11 #134-25 (500m de la universidad)</span>
+                </div>
+                <p>Se reportó robo con arma blanca. Evitar transitar solo por esta zona.</p>
             </div>
             
             <div class="alert-item">
-                <div class="alert-icon">⚠️</div>
-                <div>
-                    <div class="report-title">Corte de Energía</div>
-                    <p>Edificio B sin electricidad - En reparación</p>
-                    <div class="report-date">Hace 2 horas</div>
+                <div class="alert-header">
+                    <div class="alert-title">Estafa con taxis falsos</div>
+                    <div class="alert-time">Hace 3 horas</div>
                 </div>
+                <div class="alert-location">
+                    <span>📍</span>
+                    <span>Frente a la estación Calle 142</span>
+                </div>
+                <p>Vehículos particulares haciéndose pasar por taxis y robando a pasajeros.</p>
             </div>
             
             <div class="alert-item">
-                <div class="alert-icon">⚠️</div>
-                <div>
-                    <div class="report-title">Mantenimiento Programado</div>
-                    <p>Ascensores fuera de servicio mañana de 8am a 12pm</p>
-                    <div class="report-date">Ayer - 16:30</div>
+                <div class="alert-header">
+                    <div class="alert-title">Protestas en la zona</div>
+                    <div class="alert-time">Hoy - 08:30</div>
                 </div>
+                <div class="alert-location">
+                    <span>📍</span>
+                    <span>Autopista Norte con Calle 127</span>
+                </div>
+                <p>Manifestaciones bloqueando vías principales. Usar rutas alternas.</p>
             </div>
         </div>
         
@@ -525,7 +633,7 @@
             <div class="profile-header">
                 <div class="profile-avatar">JP</div>
                 <h3>Juan Pérez</h3>
-                <p>Estudiante de Ingeniería</p>
+                <p>Estudiante de Medicina</p>
             </div>
             
             <div class="profile-info">
@@ -535,7 +643,7 @@
                 </div>
                 <div class="info-item">
                     <div class="info-label">Correo</div>
-                    <div class="info-value">j.perez@estudiantes.uelbosque.edu.co</div>
+                    <div class="info-value">j.perez@unbosque.edu.co</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Teléfono</div>
@@ -581,7 +689,7 @@
             <span>Reportes</span>
         </a>
         <a href="#" class="nav-item" onclick="showPage('alertsPage')">
-            <span class="nav-icon">🔔</span>
+            <span class="nav-icon">⚠️</span>
             <span>Alertas</span>
         </a>
         <a href="#" class="nav-item" onclick="showPage('profilePage')">
@@ -629,9 +737,107 @@
     <!-- Audio para la alarma -->
     <audio id="alarmSound" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" loop></audio>
     
+    <!-- Leaflet JS para el mapa -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <script>
         // Variables globales
         let emergencyActive = false;
+        let map;
+        let userMarker;
+        
+        // Coordenadas de la Universidad El Bosque (Bogotá)
+        const uniBosqueCoords = [4.6843, -74.0648];
+        const userCoords = [4.6835, -74.0635]; // Cerca de la universidad
+        
+        // Puntos de interés alrededor de la universidad
+        const securityPoints = [
+            {
+                coords: [4.6845, -74.0650],
+                title: "Puesto de Seguridad UEB",
+                type: "security"
+            },
+            {
+                coords: [4.6830, -74.0630],
+                title: "CAI Calle 134",
+                type: "police"
+            },
+            {
+                coords: [4.6850, -74.0660],
+                title: "Enfermería UEB",
+                type: "medical"
+            },
+            {
+                coords: [4.6820, -74.0620],
+                title: "Zona de riesgo (Reportado)",
+                type: "danger"
+            }
+        ];
+        
+        // Inicializar mapa cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+            
+            // Simular notificación después de 3 segundos
+            setTimeout(() => {
+                showNotification("Nuevo reporte cerca: Robo en Calle 134", "rojo");
+            }, 3000);
+        });
+        
+        // Inicializar mapa del campus
+        function initMap() {
+            // Crear mapa centrado en la Universidad El Bosque
+            map = L.map('campusMap').setView(uniBosqueCoords, 16);
+            
+            // Añadir capa de OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Marcador de la universidad
+            L.marker(uniBosqueCoords, {
+                icon: L.divIcon({
+                    className: 'uni-marker',
+                    html: '🏫',
+                    iconSize: [30, 30]
+                })
+            }).addTo(map).bindPopup("Universidad El Bosque").openPopup();
+            
+            // Marcador del usuario (simulado)
+            userMarker = L.marker(userCoords, {
+                icon: L.divIcon({
+                    className: 'user-marker',
+                    html: '📍',
+                    iconSize: [25, 25]
+                })
+            }).addTo(map).bindPopup("Tu ubicación aproximada");
+            
+            // Añadir puntos de seguridad y peligro
+            securityPoints.forEach(point => {
+                let icon;
+                if (point.type === "security") {
+                    icon = L.divIcon({ className: 'security-marker', html: '🛡️', iconSize: [25, 25] });
+                } else if (point.type === "medical") {
+                    icon = L.divIcon({ className: 'medical-marker', html: '🚑', iconSize: [25, 25] });
+                } else if (point.type === "police") {
+                    icon = L.divIcon({ className: 'police-marker', html: '🚔', iconSize: [25, 25] });
+                } else {
+                    icon = L.divIcon({ className: 'danger-marker', html: '⚠️', iconSize: [25, 25] });
+                }
+                
+                L.marker(point.coords, { icon: icon })
+                    .addTo(map)
+                    .bindPopup(point.title);
+            });
+            
+            // Añadir círculo de área de riesgo
+            L.circle([4.6820, -74.0620], {
+                color: '#ff0000',
+                fillColor: '#f03',
+                fillOpacity: 0.2,
+                radius: 150
+            }).addTo(map).bindPopup("Zona con reportes recientes");
+        }
         
         // Mostrar página específica
         function showPage(pageId) {
@@ -651,6 +857,14 @@
             
             // Prevenir comportamiento por defecto del enlace
             event.preventDefault();
+            
+            // Si es la página de inicio, ajustar el mapa
+            if (pageId === 'homePage') {
+                setTimeout(() => {
+                    map.invalidateSize();
+                    map.setView(uniBosqueCoords, 16);
+                }, 300);
+            }
         }
         
         // Activar emergencia
@@ -682,13 +896,13 @@
             
             switch(type) {
                 case 'police':
-                    message = "Alerta enviada a la Policía Universitaria de la Universidad El Bosque";
+                    message = "Alerta enviada a la Policía Universitaria de la Universidad El Bosque con tu ubicación actual";
                     break;
                 case 'medical':
-                    message = "Emergencia médica reportada al servicio de salud del campus";
+                    message = "Emergencia médica reportada al servicio de salud del campus. ¡Ayuda en camino!";
                     break;
                 case 'contacts':
-                    message = "Tus contactos de emergencia han sido notificados";
+                    message = "Tus contactos de emergencia han sido notificados con tu ubicación: Calle 134 #12B-25";
                     break;
             }
             
@@ -743,11 +957,6 @@
             
             alert(message);
         }
-        
-        // Simular notificación de prueba
-        setTimeout(() => {
-            showNotification("Bienvenido a UniSegura - El Bosque", "verde");
-        }, 3000);
     </script>
 </body>
 </html>
