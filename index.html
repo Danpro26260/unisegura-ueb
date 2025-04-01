@@ -29,7 +29,7 @@
             overflow: hidden;
         }
         
-        /* Header institucional */
+        /* Header */
         .header {
             background: var(--verde-bosque);
             color: var(--blanco);
@@ -67,7 +67,7 @@
             padding-bottom: 20px;
         }
         
-        /* Páginas (secciones) */
+        /* Páginas */
         .page {
             display: none;
             padding: 1rem;
@@ -112,7 +112,7 @@
             text-align: center;
         }
         
-        /* Botón de pánico flotante */
+        /* Botón de pánico */
         .panic-btn-container {
             position: fixed;
             bottom: 100px;
@@ -134,12 +134,6 @@
             box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
             cursor: pointer;
             transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .panic-btn:active {
-            transform: scale(0.9);
         }
         
         .panic-btn.active {
@@ -152,60 +146,100 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
         }
         
-        /* Resto de estilos... */
-        .status-card {
-            background: var(--blanco);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            text-align: center;
-            border-left: 5px solid var(--verde-claro);
-        }
-        
-        .status-title {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            color: var(--gris-oscuro);
-        }
-        
-        .status-message {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .action-btn {
-            background: var(--blanco);
-            border: none;
-            border-radius: 12px;
-            padding: 1.2rem 0.5rem;
+        /* Chat */
+        .chat-container {
             display: flex;
             flex-direction: column;
+            height: calc(100vh - 250px);
+            background: var(--blanco);
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: var(--verde-bosque);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            max-width: 80%;
+        }
+        
+        .received {
+            align-self: flex-start;
+            background: #f1f1f1;
+            padding: 0.8rem;
+            border-radius: 0 12px 12px 12px;
+        }
+        
+        .sent {
+            align-self: flex-end;
+            background: var(--verde-bosque);
+            color: white;
+            padding: 0.8rem;
+            border-radius: 12px 0 12px 12px;
+        }
+        
+        .message-time {
+            font-size: 0.7rem;
+            color: #777;
+            margin-top: 0.3rem;
+            text-align: right;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #eee;
+            background: var(--blanco);
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            margin-right: 0.5rem;
+        }
+        
+        .send-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--verde-bosque);
+            color: white;
+            border: none;
+            display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transition: all 0.3s;
         }
         
-        .action-btn:active {
-            transform: scale(0.96);
+        /* Tarjetas */
+        .card {
+            background: var(--blanco);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
-        .btn-icon {
-            font-size: 2rem;
+        .card-title {
+            font-weight: 600;
             margin-bottom: 0.5rem;
-        }
-        
-        .btn-text {
-            font-size: 0.85rem;
-            font-weight: 500;
+            color: var(--gris-oscuro);
         }
         
         /* Barra de navegación */
@@ -257,53 +291,6 @@
             transform: translateY(-5px);
         }
         
-        /* Estilos para reportes */
-        .report-card {
-            background: var(--blanco);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        
-        .report-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-        
-        .report-title {
-            font-weight: 600;
-            color: var(--gris-oscuro);
-        }
-        
-        .report-status {
-            font-size: 0.8rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 12px;
-            background: #E8F5E9;
-            color: #2E7D32;
-        }
-        
-        .report-status.emergency {
-            background: #FFEBEE;
-            color: #C62828;
-        }
-        
-        .report-location {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            color: #666;
-            font-size: 0.8rem;
-            margin: 0.3rem 0;
-        }
-        
-        .report-date {
-            color: #777;
-            font-size: 0.8rem;
-        }
-        
         /* Notificación */
         .notification {
             position: fixed;
@@ -338,7 +325,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Header institucional -->
+    <!-- Header -->
     <div class="header">
         <div class="logo">
             <div class="logo-icon">UEB</div>
@@ -347,13 +334,13 @@
         <p>Seguridad integral para nuestra comunidad</p>
     </div>
     
-    <!-- Contenido principal - Páginas -->
+    <!-- Contenido principal -->
     <div class="main-content">
         <!-- Página de Inicio -->
         <div id="homePage" class="page active">
-            <div class="status-card">
-                <div class="status-title">Sistema de Seguridad Activo</div>
-                <div class="status-message">Conectado a la red de la Universidad El Bosque</div>
+            <div class="card">
+                <div class="card-title">Sistema de Seguridad Activo</div>
+                <p>Conectado a la red de la Universidad El Bosque</p>
             </div>
             
             <div class="map-container">
@@ -361,90 +348,70 @@
                 <div class="map-overlay">📍 Campus Principal - Universidad El Bosque</div>
             </div>
             
-            <div class="action-buttons">
-                <button class="action-btn" onclick="openModal('security')">
-                    <span class="btn-icon">🛡️</span>
-                    <span class="btn-text">Seguridad</span>
-                </button>
-                <button class="action-btn" onclick="openModal('medical')">
-                    <span class="btn-icon">🚑</span>
-                    <span class="btn-text">Emergencia Médica</span>
-                </button>
-                <button class="action-btn" onclick="openModal('contacts')">
-                    <span class="btn-icon">👥</span>
-                    <span class="btn-text">Contactos</span>
-                </button>
-                <button class="action-btn" onclick="showPage('alertsPage')">
-                    <span class="btn-icon">⚠️</span>
-                    <span class="btn-text">Alertas</span>
-                </button>
+            <div class="card">
+                <div class="card-title">Acciones rápidas</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <button style="padding: 0.8rem; background: var(--blanco); border: none; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" onclick="showPage('chatPage')">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">🛡️</div>
+                        <div>Chat Seguridad</div>
+                    </button>
+                    <button style="padding: 0.8rem; background: var(--blanco); border: none; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" onclick="showPage('reportsPage')">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">📝</div>
+                        <div>Reportes</div>
+                    </button>
+                </div>
             </div>
-            
-            <div class="status-card" style="border-left-color: #FFA500;">
-                <div class="status-title">Botón de Pánico</div>
-                <div class="status-message">Presiona el botón rojo en caso de emergencia</div>
+        </div>
+        
+        <!-- Página de Chat -->
+        <div id="chatPage" class="page">
+            <div class="chat-container">
+                <div class="chat-header">
+                    Chat con Seguridad Universitaria
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message received">
+                        <div>Hola, soy el Oficial Martínez. ¿En qué puedo ayudarte?</div>
+                        <div class="message-time">10:24 AM</div>
+                    </div>
+                    <div class="message sent">
+                        <div>Hay una persona sospechosa en la biblioteca</div>
+                        <div class="message-time">10:25 AM</div>
+                    </div>
+                    <div class="message received">
+                        <div>Gracias por reportar. ¿Puedes describir a la persona?</div>
+                        <div class="message-time">10:26 AM</div>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="messageInput" placeholder="Escribe tu mensaje..." onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" onclick="sendMessage()">↑</button>
+                </div>
             </div>
         </div>
         
         <!-- Página de Reportes -->
         <div id="reportsPage" class="page">
-            <h3 style="margin-bottom: 1rem;">Reportes de Seguridad</h3>
-            
-            <div class="report-card">
-                <div class="report-header">
-                    <div class="report-title">Robo a mano armada</div>
-                    <div class="report-status emergency">URGENTE</div>
+            <div class="card">
+                <div class="card-title">Reportar Incidente</div>
+                <div style="margin-top: 1rem;">
+                    <select id="incidentType" style="width: 100%; padding: 0.8rem; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 1rem;">
+                        <option value="">Tipo de incidente</option>
+                        <option value="robo">Robo</option>
+                        <option value="sospechoso">Persona sospechosa</option>
+                        <option value="accidente">Accidente</option>
+                        <option value="medica">Emergencia médica</option>
+                    </select>
+                    <textarea id="incidentDescription" style="width: 100%; padding: 0.8rem; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 1rem;" placeholder="Descripción del incidente"></textarea>
+                    <button onclick="submitReport()" style="width: 100%; padding: 1rem; background: var(--verde-bosque); color: white; border: none; border-radius: 10px;">Enviar Reporte</button>
                 </div>
-                <div class="report-location">
-                    <span>📍</span>
-                    <span>Calle 134 con Autopista Norte</span>
-                </div>
-                <p>Hombre armado robó pertenencias a estudiantes cerca de la estación de Transmilenio</p>
-                <div class="report-date">Hoy - 15:30 | Reportado por: Ana Martínez</div>
             </div>
             
-            <div class="report-card">
-                <div class="report-header">
-                    <div class="report-title">Persona sospechosa</div>
-                    <div class="report-status">ACTIVO</div>
+            <div class="card">
+                <div class="card-title">Mis Reportes Recientes</div>
+                <div id="reportsList" style="margin-top: 1rem;">
+                    <!-- Los reportes se cargarán aquí dinámicamente -->
                 </div>
-                <div class="report-location">
-                    <span>📍</span>
-                    <span>Carrera 9 con Calle 131</span>
-                </div>
-                <p>Individuo merodeando y tomando fotos a estudiantes desde hace 2 horas</p>
-                <div class="report-date">Ayer - 18:45 | Reportado por: Oficial de Seguridad</div>
-            </div>
-        </div>
-        
-        <!-- Página de Alertas -->
-        <div id="alertsPage" class="page">
-            <h3 style="margin-bottom: 1rem;">Alertas de Seguridad</h3>
-            
-            <div class="report-card">
-                <div class="report-header">
-                    <div class="report-title">Robo violento en el sector</div>
-                    <div class="report-status emergency">NUEVO</div>
-                </div>
-                <div class="report-location">
-                    <span>📍</span>
-                    <span>Carrera 11 #134-25 (500m de la universidad)</span>
-                </div>
-                <p>Se reportó robo con arma blanca. Evitar transitar solo por esta zona.</p>
-                <div class="report-date">Hace 25 min | Fuente: Policía Nacional</div>
-            </div>
-            
-            <div class="report-card">
-                <div class="report-header">
-                    <div class="report-title">Estafa con taxis falsos</div>
-                    <div class="report-status">VIGENTE</div>
-                </div>
-                <div class="report-location">
-                    <span>📍</span>
-                    <span>Frente a la estación Calle 142</span>
-                </div>
-                <p>Vehículos particulares haciéndose pasar por taxis y robando a pasajeros.</p>
-                <div class="report-date">Hace 3 horas | Fuente: Seguridad UEB</div>
             </div>
         </div>
         
@@ -456,7 +423,7 @@
                 <p>Estudiante de Medicina</p>
             </div>
             
-            <div class="report-card">
+            <div class="card">
                 <div style="margin-bottom: 1rem;">
                     <div style="font-size: 0.8rem; color: #777;">Matrícula</div>
                     <div style="font-weight: 500;">20231045</div>
@@ -471,25 +438,27 @@
                 </div>
             </div>
             
-            <div class="report-card">
-                <h4 style="margin-bottom: 1rem;">Contactos de Emergencia</h4>
-                <div style="margin-bottom: 1rem;">
-                    <div style="font-size: 0.8rem; color: #777;">María Gómez</div>
-                    <div style="font-weight: 500;">Madre - 555 123 4567</div>
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <div style="font-size: 0.8rem; color: #777;">Carlos Pérez</div>
-                    <div style="font-weight: 500;">Padre - 555 765 4321</div>
-                </div>
-                <div>
-                    <div style="font-size: 0.8rem; color: #777;">Seguridad UEB</div>
-                    <div style="font-weight: 500;">555 987 6543</div>
+            <div class="card">
+                <div class="card-title">Contactos de Emergencia</div>
+                <div style="margin-top: 1rem;">
+                    <div style="padding: 1rem; border-bottom: 1px solid #eee;">
+                        <div style="font-weight: 500;">María Gómez</div>
+                        <div style="font-size: 0.8rem; color: #777;">Madre - 555 123 4567</div>
+                    </div>
+                    <div style="padding: 1rem; border-bottom: 1px solid #eee;">
+                        <div style="font-weight: 500;">Carlos Pérez</div>
+                        <div style="font-size: 0.8rem; color: #777;">Padre - 555 765 4321</div>
+                    </div>
+                    <div style="padding: 1rem;">
+                        <div style="font-weight: 500;">Seguridad UEB</div>
+                        <div style="font-size: 0.8rem; color: #777;">555 987 6543</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Botón de pánico flotante -->
+    <!-- Botón de pánico -->
     <div class="panic-btn-container">
         <button id="panicButton" class="panic-btn">🚨</button>
     </div>
@@ -500,13 +469,13 @@
             <span class="nav-icon">🏠</span>
             <span>Inicio</span>
         </a>
+        <a href="#" class="nav-item" onclick="showPage('chatPage')">
+            <span class="nav-icon">💬</span>
+            <span>Chat</span>
+        </a>
         <a href="#" class="nav-item" onclick="showPage('reportsPage')">
             <span class="nav-icon">📝</span>
             <span>Reportes</span>
-        </a>
-        <a href="#" class="nav-item" onclick="showPage('alertsPage')">
-            <span class="nav-icon">⚠️</span>
-            <span>Alertas</span>
         </a>
         <a href="#" class="nav-item" onclick="showPage('profilePage')">
             <span class="nav-icon">👤</span>
@@ -519,12 +488,9 @@
         ¡Alerta recibida en tu zona!
     </div>
     
-    <!-- Audio para la sirena (base64 encoded) -->
-    <audio id="sirenSound" loop>
-        <source src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==" type="audio/mpeg">
-    </audio>
-    
-    <!-- Leaflet JS -->
+    <!-- Audio de sirena (usando Howler.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <!-- Leaflet JS para el mapa -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <script>
@@ -532,15 +498,37 @@
         let emergencyActive = false;
         let map;
         let userMarker;
+        let reports = [
+            {
+                id: 1,
+                type: "robo",
+                description: "Robo de celular en la biblioteca",
+                location: "Biblioteca Central",
+                date: "15/03/2023 14:30",
+                status: "en_revision"
+            },
+            {
+                id: 2,
+                type: "sospechoso",
+                description: "Persona merodeando en estacionamiento",
+                location: "Estacionamiento Norte",
+                date: "10/03/2023 08:45",
+                status: "resuelto"
+            }
+        ];
         
-        // Coordenadas de la Universidad El Bosque (Bogotá)
-        const uniBosqueCoords = [4.6843, -74.0648];
-        const userCoords = [4.6835, -74.0635];
+        // Configurar sirena con Howler
+        const sirenSound = new Howl({
+            src: ['https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3'],
+            loop: true,
+            volume: 0.8
+        });
         
         // Inicializar la aplicación
         document.addEventListener('DOMContentLoaded', function() {
             initMap();
             setupPanicButton();
+            loadReports();
             
             // Mostrar notificación de prueba
             setTimeout(() => {
@@ -550,14 +538,14 @@
         
         // Inicializar mapa
         function initMap() {
-            map = L.map('campusMap').setView(uniBosqueCoords, 16);
+            map = L.map('campusMap').setView([4.6843, -74.0648], 16);
             
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
             
             // Marcador de la universidad
-            L.marker(uniBosqueCoords, {
+            L.marker([4.6843, -74.0648], {
                 icon: L.divIcon({
                     className: 'uni-marker',
                     html: '🏫',
@@ -566,7 +554,7 @@
             }).addTo(map).bindPopup("Universidad El Bosque");
             
             // Marcador del usuario
-            userMarker = L.marker(userCoords, {
+            userMarker = L.marker([4.6835, -74.0635], {
                 icon: L.divIcon({
                     className: 'user-marker',
                     html: '📍',
@@ -605,29 +593,43 @@
         // Configurar botón de pánico
         function setupPanicButton() {
             const panicButton = document.getElementById('panicButton');
-            const sirenSound = document.getElementById('sirenSound');
             
             panicButton.addEventListener('click', function() {
                 if (!emergencyActive) {
-                    // Activar emergencia
-                    emergencyActive = true;
-                    panicButton.classList.add('active');
-                    sirenSound.play();
-                    
-                    // Vibrar en dispositivos móviles
-                    if (navigator.vibrate) {
-                        navigator.vibrate([500, 200, 500, 200, 500]);
+                    if (confirm("¿Estás seguro que quieres activar la alarma de emergencia?")) {
+                        emergencyActive = true;
+                        panicButton.classList.add('active');
+                        sirenSound.play();
+                        
+                        // Vibrar en dispositivos móviles
+                        if (navigator.vibrate) {
+                            navigator.vibrate([500, 200, 500, 200, 500]);
+                        }
+                        
+                        // Mostrar alerta
+                        showNotification("¡ALERTA DE EMERGENCIA ACTIVADA!", "rojo");
+                        alert("¡Se ha activado la alarma! Seguridad ha sido notificada");
+                        
+                        // Notificar al chat automáticamente
+                        addMessage("Sistema", "Alerta de emergencia activada desde tu ubicación", "received");
+                        
+                        // Crear reporte automático
+                        const newReport = {
+                            id: reports.length + 1,
+                            type: "emergencia",
+                            description: "Botón de pánico activado",
+                            location: "Ubicación del usuario",
+                            date: new Date().toLocaleString(),
+                            status: "en_revision"
+                        };
+                        reports.unshift(newReport);
+                        loadReports();
                     }
-                    
-                    // Mostrar alerta
-                    showNotification("¡ALERTA DE EMERGENCIA ACTIVADA!", "rojo");
-                    alert("¡Se ha activado la alarma! Se notificó a seguridad");
                 } else {
                     // Desactivar emergencia
                     emergencyActive = false;
                     panicButton.classList.remove('active');
-                    sirenSound.pause();
-                    sirenSound.currentTime = 0;
+                    sirenSound.stop();
                     
                     if (navigator.vibrate) {
                         navigator.vibrate(0);
@@ -635,6 +637,119 @@
                     
                     showNotification("Alarma desactivada", "verde");
                 }
+            });
+        }
+        
+        // Funciones del chat
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            if (input.value.trim() !== "") {
+                addMessage("Tú", input.value, "sent");
+                input.value = "";
+                
+                // Simular respuesta después de 1-3 segundos
+                setTimeout(() => {
+                    const responses = [
+                        "Hemos recibido tu mensaje",
+                        "Un equipo está en camino",
+                        "¿Puedes dar más detalles?",
+                        "Gracias por reportar",
+                        "¿En qué área exactamente?",
+                        "¿La persona aún está allí?"
+                    ];
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    addMessage("Oficial Martínez", randomResponse, "received");
+                }, 1000 + Math.random() * 2000);
+            }
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+        
+        function addMessage(sender, text, type) {
+            const chat = document.getElementById('chatMessages');
+            const now = new Date();
+            const timeString = now.getHours() + ":" + (now.getMinutes() < 10 ? "0" : "") + now.getMinutes();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = `
+                <div>${text}</div>
+                <div class="message-time">${timeString}</div>
+            `;
+            
+            chat.appendChild(messageDiv);
+            chat.scrollTop = chat.scrollHeight;
+        }
+        
+        // Funciones de reportes
+        function submitReport() {
+            const type = document.getElementById('incidentType').value;
+            const description = document.getElementById('incidentDescription').value;
+            
+            if (!type || !description) {
+                alert("Por favor completa todos los campos");
+                return;
+            }
+            
+            const typeText = {
+                'robo': 'Robo',
+                'sospechoso': 'Persona sospechosa',
+                'accidente': 'Accidente',
+                'medica': 'Emergencia médica'
+            }[type];
+            
+            const newReport = {
+                id: reports.length + 1,
+                type: type,
+                description: description,
+                location: "Campus Principal",
+                date: new Date().toLocaleString(),
+                status: "en_revision"
+            };
+            
+            reports.unshift(newReport);
+            loadReports();
+            
+            // Limpiar formulario
+            document.getElementById('incidentType').value = "";
+            document.getElementById('incidentDescription').value = "";
+            
+            // Mostrar confirmación
+            showNotification("Reporte enviado con éxito", "verde");
+            
+            // Notificar al chat
+            addMessage("Sistema", `Nuevo reporte de ${typeText}: ${description}`, "received");
+        }
+        
+        function loadReports() {
+            const container = document.getElementById('reportsList');
+            container.innerHTML = "";
+            
+            reports.forEach(report => {
+                const statusText = {
+                    'en_revision': 'En revisión',
+                    'resuelto': 'Resuelto'
+                }[report.status] || report.status;
+                
+                const statusColor = {
+                    'en_revision': 'var(--verde-bosque)',
+                    'resuelto': '#777'
+                }[report.status] || '#777';
+                
+                const reportDiv = document.createElement('div');
+                reportDiv.style.padding = '1rem';
+                reportDiv.style.borderBottom = '1px solid #eee';
+                reportDiv.innerHTML = `
+                    <div style="font-weight: 500;">${report.description}</div>
+                    <div style="font-size: 0.8rem; color: #777;">${report.location} - ${report.date}</div>
+                    <div style="font-size: 0.8rem; color: ${statusColor};">${statusText}</div>
+                `;
+                
+                container.appendChild(reportDiv);
             });
         }
         
@@ -670,11 +785,6 @@
                     map.invalidateSize();
                 }, 300);
             }
-        }
-        
-        // Función para abrir modales
-        function openModal(type) {
-            alert(`Función de ${type} activada`);
         }
     </script>
 </body>
