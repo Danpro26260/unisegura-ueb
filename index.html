@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniSegura - El Bosque</title>
+    <title>UniSegura - Universidad El Bosque</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
             --verde-bosque: #2E8B57;
             --verde-claro: #3CB371;
             --blanco: #FFFFFF;
-            --rojo-emergencia: #FF4500;
+            --rojo-emergencia: #FF0000;
             --gris-oscuro: #36454F;
             --gris-claro: #F5F5F5;
         }
@@ -64,6 +64,7 @@
         .main-content {
             height: calc(100vh - 180px);
             overflow-y: auto;
+            padding-bottom: 20px;
         }
         
         /* Páginas (secciones) */
@@ -82,16 +83,76 @@
             to { opacity: 1; }
         }
         
-        /* Mapa del campus */
-        #campusMap {
-            height: 300px;
-            width: 100%;
-            border-radius: 15px;
+        /* Mapa compacto */
+        .map-container {
+            position: relative;
             margin-bottom: 1rem;
+            border-radius: 15px;
+            overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            height: 200px;
         }
         
-        /* Tarjeta de estado */
+        #campusMap {
+            height: 100%;
+            width: 100%;
+        }
+        
+        .map-overlay {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        /* Botón de pánico flotante */
+        .panic-btn-container {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .panic-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--rojo-emergencia);
+            color: var(--blanco);
+            border: none;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .panic-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .panic-btn.active {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 0, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+        }
+        
+        /* Resto de estilos... */
         .status-card {
             background: var(--blanco);
             border-radius: 15px;
@@ -113,7 +174,6 @@
             color: #666;
         }
         
-        /* Botones principales */
         .action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -148,56 +208,7 @@
             font-weight: 500;
         }
         
-        /* Botón de pánico */
-        .panic-btn-container {
-            position: fixed;
-            bottom: 100px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            z-index: 10;
-        }
-        
-        .panic-btn {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, var(--rojo-emergencia), #FF6347);
-            border: none;
-            color: var(--blanco);
-            font-size: 1.8rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.4);
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .panic-btn:active {
-            transform: scale(0.9);
-        }
-        
-        .panic-btn::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(0.8); opacity: 0.8; }
-            70% { transform: scale(1.3); opacity: 0; }
-            100% { transform: scale(0.8); opacity: 0; }
-        }
-        
-        /* Barra de navegación MEJORADA */
+        /* Barra de navegación */
         .nav-bar {
             position: fixed;
             bottom: 0;
@@ -246,7 +257,7 @@
             transform: translateY(-5px);
         }
         
-        /* Estilos para la página de reportes */
+        /* Estilos para reportes */
         .report-card {
             background: var(--blanco);
             border-radius: 12px;
@@ -293,162 +304,6 @@
             font-size: 0.8rem;
         }
         
-        /* Estilos para la página de alertas */
-        .alert-item {
-            background: var(--blanco);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border-left: 4px solid var(--rojo-emergencia);
-        }
-        
-        .alert-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-        
-        .alert-title {
-            font-weight: 600;
-            color: var(--gris-oscuro);
-        }
-        
-        .alert-time {
-            color: #777;
-            font-size: 0.8rem;
-        }
-        
-        .alert-location {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            color: #666;
-            font-size: 0.8rem;
-            margin: 0.3rem 0;
-        }
-        
-        /* Estilos para la página de perfil */
-        .profile-header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-        
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: var(--verde-bosque);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            margin: 0 auto 1rem;
-        }
-        
-        .profile-info {
-            background: var(--blanco);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        
-        .info-item {
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .info-item:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        
-        .info-label {
-            font-size: 0.8rem;
-            color: #777;
-        }
-        
-        .info-value {
-            font-weight: 500;
-        }
-        
-        /* Modal de emergencia */
-        .emergency-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 100;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 1.5rem;
-        }
-        
-        .emergency-modal.active {
-            display: flex;
-        }
-        
-        .emergency-options {
-            width: 100%;
-            max-width: 400px;
-        }
-        
-        .emergency-option {
-            background: var(--blanco);
-            border-radius: 12px;
-            padding: 1.2rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        .emergency-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--verde-bosque);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--blanco);
-            font-size: 1.2rem;
-            margin-right: 1rem;
-            flex-shrink: 0;
-        }
-        
-        .emergency-text {
-            flex: 1;
-        }
-        
-        .emergency-title {
-            font-weight: 600;
-            margin-bottom: 0.2rem;
-        }
-        
-        .emergency-desc {
-            font-size: 0.8rem;
-            color: #666;
-        }
-        
-        .cancel-btn {
-            background: transparent;
-            color: var(--blanco);
-            border: 1px solid var(--blanco);
-            border-radius: 25px;
-            padding: 0.8rem 2rem;
-            margin-top: 1.5rem;
-            font-weight: 500;
-        }
-        
         /* Notificación */
         .notification {
             position: fixed;
@@ -470,22 +325,14 @@
             to { top: 70px; opacity: 1; }
         }
         
-        /* Mejoras para el mapa */
-        .map-container {
-            position: relative;
-            margin-bottom: 1rem;
+        /* Estado de emergencia */
+        .emergency-active {
+            animation: blink 1s infinite;
         }
         
-        .map-overlay {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(255,255,255,0.9);
-            padding: 0.5rem 1rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -534,8 +381,8 @@
             </div>
             
             <div class="status-card" style="border-left-color: #FFA500;">
-                <div class="status-title">Prueba el sistema</div>
-                <div class="status-message">Presiona el botón rojo para simular una emergencia</div>
+                <div class="status-title">Botón de Pánico</div>
+                <div class="status-message">Presiona el botón rojo en caso de emergencia</div>
             </div>
         </div>
         
@@ -550,7 +397,7 @@
                 </div>
                 <div class="report-location">
                     <span>📍</span>
-                    <span>Calle 134 con Autopista Norte (Fuera de campus)</span>
+                    <span>Calle 134 con Autopista Norte</span>
                 </div>
                 <p>Hombre armado robó pertenencias a estudiantes cerca de la estación de Transmilenio</p>
                 <div class="report-date">Hoy - 15:30 | Reportado por: Ana Martínez</div>
@@ -563,122 +410,91 @@
                 </div>
                 <div class="report-location">
                     <span>📍</span>
-                    <span>Carrera 9 con Calle 131 (Parque frente a la U)</span>
+                    <span>Carrera 9 con Calle 131</span>
                 </div>
                 <p>Individuo merodeando y tomando fotos a estudiantes desde hace 2 horas</p>
                 <div class="report-date">Ayer - 18:45 | Reportado por: Oficial de Seguridad</div>
             </div>
-            
-            <div class="report-card">
-                <div class="report-header">
-                    <div class="report-title">Hurto de celulares</div>
-                    <div class="report-status">VIGENTE</div>
-                </div>
-                <div class="report-location">
-                    <span>📍</span>
-                    <span>Centro Comercial Santa Bárbara (Frente a la universidad)</span>
-                </div>
-                <p>Banda organizada robando celulares en el sector de comidas rápidas</p>
-                <div class="report-date">12/04/2023 - 12:20 | Reportado por: Carlos Gómez</div>
-            </div>
-            
-            <button style="width: 100%; padding: 1rem; background: var(--verde-bosque); color: white; border: none; border-radius: 12px; margin-top: 1rem;">
-                + Nuevo Reporte
-            </button>
         </div>
         
         <!-- Página de Alertas -->
         <div id="alertsPage" class="page">
             <h3 style="margin-bottom: 1rem;">Alertas de Seguridad</h3>
             
-            <div class="alert-item">
-                <div class="alert-header">
-                    <div class="alert-title">Robo violento en el sector</div>
-                    <div class="alert-time">Hace 25 min</div>
+            <div class="report-card">
+                <div class="report-header">
+                    <div class="report-title">Robo violento en el sector</div>
+                    <div class="report-status emergency">NUEVO</div>
                 </div>
-                <div class="alert-location">
+                <div class="report-location">
                     <span>📍</span>
                     <span>Carrera 11 #134-25 (500m de la universidad)</span>
                 </div>
                 <p>Se reportó robo con arma blanca. Evitar transitar solo por esta zona.</p>
+                <div class="report-date">Hace 25 min | Fuente: Policía Nacional</div>
             </div>
             
-            <div class="alert-item">
-                <div class="alert-header">
-                    <div class="alert-title">Estafa con taxis falsos</div>
-                    <div class="alert-time">Hace 3 horas</div>
+            <div class="report-card">
+                <div class="report-header">
+                    <div class="report-title">Estafa con taxis falsos</div>
+                    <div class="report-status">VIGENTE</div>
                 </div>
-                <div class="alert-location">
+                <div class="report-location">
                     <span>📍</span>
                     <span>Frente a la estación Calle 142</span>
                 </div>
                 <p>Vehículos particulares haciéndose pasar por taxis y robando a pasajeros.</p>
-            </div>
-            
-            <div class="alert-item">
-                <div class="alert-header">
-                    <div class="alert-title">Protestas en la zona</div>
-                    <div class="alert-time">Hoy - 08:30</div>
-                </div>
-                <div class="alert-location">
-                    <span>📍</span>
-                    <span>Autopista Norte con Calle 127</span>
-                </div>
-                <p>Manifestaciones bloqueando vías principales. Usar rutas alternas.</p>
+                <div class="report-date">Hace 3 horas | Fuente: Seguridad UEB</div>
             </div>
         </div>
         
         <!-- Página de Perfil -->
         <div id="profilePage" class="page">
-            <div class="profile-header">
-                <div class="profile-avatar">JP</div>
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--verde-bosque); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1rem;">JP</div>
                 <h3>Juan Pérez</h3>
                 <p>Estudiante de Medicina</p>
             </div>
             
-            <div class="profile-info">
-                <div class="info-item">
-                    <div class="info-label">Matrícula</div>
-                    <div class="info-value">20231045</div>
+            <div class="report-card">
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-size: 0.8rem; color: #777;">Matrícula</div>
+                    <div style="font-weight: 500;">20231045</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Correo</div>
-                    <div class="info-value">j.perez@unbosque.edu.co</div>
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-size: 0.8rem; color: #777;">Correo</div>
+                    <div style="font-weight: 500;">j.perez@unbosque.edu.co</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Teléfono</div>
-                    <div class="info-value">+57 310 123 4567</div>
+                <div>
+                    <div style="font-size: 0.8rem; color: #777;">Teléfono</div>
+                    <div style="font-weight: 500;">+57 310 123 4567</div>
                 </div>
             </div>
             
-            <div class="profile-info">
+            <div class="report-card">
                 <h4 style="margin-bottom: 1rem;">Contactos de Emergencia</h4>
-                <div class="info-item">
-                    <div class="info-label">María Gómez</div>
-                    <div class="info-value">Madre - 555 123 4567</div>
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-size: 0.8rem; color: #777;">María Gómez</div>
+                    <div style="font-weight: 500;">Madre - 555 123 4567</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Carlos Pérez</div>
-                    <div class="info-value">Padre - 555 765 4321</div>
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-size: 0.8rem; color: #777;">Carlos Pérez</div>
+                    <div style="font-weight: 500;">Padre - 555 765 4321</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Seguridad UEB</div>
-                    <div class="info-value">555 987 6543</div>
+                <div>
+                    <div style="font-size: 0.8rem; color: #777;">Seguridad UEB</div>
+                    <div style="font-weight: 500;">555 987 6543</div>
                 </div>
             </div>
-            
-            <button style="width: 100%; padding: 1rem; background: var(--gris-claro); color: var(--verde-bosque); border: 1px solid var(--verde-bosque); border-radius: 12px; margin-top: 1rem;">
-                Configuración
-            </button>
         </div>
     </div>
     
     <!-- Botón de pánico flotante -->
     <div class="panic-btn-container">
-        <button class="panic-btn" onclick="activateEmergency()">🚨</button>
+        <button id="panicButton" class="panic-btn">🚨</button>
     </div>
     
-    <!-- Barra de navegación MEJORADA -->
+    <!-- Barra de navegación -->
     <div class="nav-bar">
         <a href="#" class="nav-item active" onclick="showPage('homePage')">
             <span class="nav-icon">🏠</span>
@@ -698,48 +514,17 @@
         </a>
     </div>
     
-    <!-- Modal de emergencia -->
-    <div id="emergencyModal" class="emergency-modal">
-        <div class="emergency-options">
-            <div class="emergency-option" onclick="sendAlert('police')">
-                <div class="emergency-icon">🚔</div>
-                <div class="emergency-text">
-                    <div class="emergency-title">Policía Universitaria</div>
-                    <div class="emergency-desc">Alertar al personal de seguridad del campus</div>
-                </div>
-            </div>
-            
-            <div class="emergency-option" onclick="sendAlert('medical')">
-                <div class="emergency-icon">🚑</div>
-                <div class="emergency-text">
-                    <div class="emergency-title">Emergencia Médica</div>
-                    <div class="emergency-desc">Solicitar ayuda médica inmediata</div>
-                </div>
-            </div>
-            
-            <div class="emergency-option" onclick="sendAlert('contacts')">
-                <div class="emergency-icon">👥</div>
-                <div class="emergency-text">
-                    <div class="emergency-title">Contactos de Emergencia</div>
-                    <div class="emergency-desc">Notificar a tus contactos registrados</div>
-                </div>
-            </div>
-        </div>
-        
-        <button class="cancel-btn" onclick="closeModal()">Cancelar</button>
-    </div>
-    
     <!-- Notificación -->
     <div id="notification" class="notification">
         ¡Alerta recibida en tu zona!
     </div>
     
-<!-- Audio para la sirena de emergencia (base64 encoded) -->
+    <!-- Audio para la sirena (base64 encoded) -->
     <audio id="sirenSound" loop>
         <source src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==" type="audio/mpeg">
     </audio>
     
-    <!-- Leaflet JS para el mapa -->
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <script>
@@ -750,48 +535,23 @@
         
         // Coordenadas de la Universidad El Bosque (Bogotá)
         const uniBosqueCoords = [4.6843, -74.0648];
-        const userCoords = [4.6835, -74.0635]; // Cerca de la universidad
+        const userCoords = [4.6835, -74.0635];
         
-        // Puntos de interés alrededor de la universidad
-        const securityPoints = [
-            {
-                coords: [4.6845, -74.0650],
-                title: "Puesto de Seguridad UEB",
-                type: "security"
-            },
-            {
-                coords: [4.6830, -74.0630],
-                title: "CAI Calle 134",
-                type: "police"
-            },
-            {
-                coords: [4.6850, -74.0660],
-                title: "Enfermería UEB",
-                type: "medical"
-            },
-            {
-                coords: [4.6820, -74.0620],
-                title: "Zona de riesgo (Reportado)",
-                type: "danger"
-            }
-        ];
-        
-        // Inicializar mapa cuando el DOM esté listo
+        // Inicializar la aplicación
         document.addEventListener('DOMContentLoaded', function() {
             initMap();
+            setupPanicButton();
             
-            // Simular notificación después de 3 segundos
+            // Mostrar notificación de prueba
             setTimeout(() => {
-                showNotification("Nuevo reporte cerca: Robo en Calle 134", "rojo");
-            }, 3000);
+                showNotification("Bienvenido a UniSegura", "verde");
+            }, 2000);
         });
         
-        // Inicializar mapa del campus
+        // Inicializar mapa
         function initMap() {
-            // Crear mapa centrado en la Universidad El Bosque
             map = L.map('campusMap').setView(uniBosqueCoords, 16);
             
-            // Añadir capa de OpenStreetMap
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
@@ -803,9 +563,9 @@
                     html: '🏫',
                     iconSize: [30, 30]
                 })
-            }).addTo(map).bindPopup("Universidad El Bosque").openPopup();
+            }).addTo(map).bindPopup("Universidad El Bosque");
             
-            // Marcador del usuario (simulado)
+            // Marcador del usuario
             userMarker = L.marker(userCoords, {
                 icon: L.divIcon({
                     className: 'user-marker',
@@ -814,123 +574,75 @@
                 })
             }).addTo(map).bindPopup("Tu ubicación aproximada");
             
-            // Añadir puntos de seguridad y peligro
-            securityPoints.forEach(point => {
+            // Puntos de seguridad
+            addSecurityPoints();
+        }
+        
+        // Añadir puntos de seguridad
+        function addSecurityPoints() {
+            const points = [
+                { coords: [4.6845, -74.0650], title: "Puesto de Seguridad UEB", type: "security" },
+                { coords: [4.6830, -74.0630], title: "CAI Calle 134", type: "police" },
+                { coords: [4.6820, -74.0620], title: "Zona de riesgo", type: "danger" }
+            ];
+            
+            points.forEach(point => {
                 let icon;
                 if (point.type === "security") {
-                    icon = L.divIcon({ className: 'security-marker', html: '🛡️', iconSize: [25, 25] });
-                } else if (point.type === "medical") {
-                    icon = L.divIcon({ className: 'medical-marker', html: '🚑', iconSize: [25, 25] });
+                    icon = L.divIcon({ html: '🛡️', iconSize: [25, 25] });
                 } else if (point.type === "police") {
-                    icon = L.divIcon({ className: 'police-marker', html: '🚔', iconSize: [25, 25] });
+                    icon = L.divIcon({ html: '🚔', iconSize: [25, 25] });
                 } else {
-                    icon = L.divIcon({ className: 'danger-marker', html: '⚠️', iconSize: [25, 25] });
+                    icon = L.divIcon({ html: '⚠️', iconSize: [25, 25] });
                 }
                 
                 L.marker(point.coords, { icon: icon })
                     .addTo(map)
                     .bindPopup(point.title);
             });
-            
-            // Añadir círculo de área de riesgo
-            L.circle([4.6820, -74.0620], {
-                color: '#ff0000',
-                fillColor: '#f03',
-                fillOpacity: 0.2,
-                radius: 150
-            }).addTo(map).bindPopup("Zona con reportes recientes");
         }
         
-        // Mostrar página específica
-        function showPage(pageId) {
-            // Ocultar todas las páginas
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
+        // Configurar botón de pánico
+        function setupPanicButton() {
+            const panicButton = document.getElementById('panicButton');
+            const sirenSound = document.getElementById('sirenSound');
             
-            // Mostrar la página seleccionada
-            document.getElementById(pageId).classList.add('active');
-            
-            // Actualizar navegación
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
-            
-            // Prevenir comportamiento por defecto del enlace
-            event.preventDefault();
-            
-            // Si es la página de inicio, ajustar el mapa
-            if (pageId === 'homePage') {
-                setTimeout(() => {
-                    map.invalidateSize();
-                    map.setView(uniBosqueCoords, 16);
-                }, 300);
-            }
-        }
-        
-        // Activar emergencia
-        function activateEmergency() {
-            if (!emergencyActive) {
-                emergencyActive = true;
-                document.getElementById('emergencyModal').classList.add('active');
-                
-                // Vibrar en dispositivos móviles
-                if (navigator.vibrate) {
-                    navigator.vibrate([200, 100, 200, 100, 200]);
+            panicButton.addEventListener('click', function() {
+                if (!emergencyActive) {
+                    // Activar emergencia
+                    emergencyActive = true;
+                    panicButton.classList.add('active');
+                    sirenSound.play();
+                    
+                    // Vibrar en dispositivos móviles
+                    if (navigator.vibrate) {
+                        navigator.vibrate([500, 200, 500, 200, 500]);
+                    }
+                    
+                    // Mostrar alerta
+                    showNotification("¡ALERTA DE EMERGENCIA ACTIVADA!", "rojo");
+                    alert("¡Se ha activado la alarma! Se notificó a seguridad");
+                } else {
+                    // Desactivar emergencia
+                    emergencyActive = false;
+                    panicButton.classList.remove('active');
+                    sirenSound.pause();
+                    sirenSound.currentTime = 0;
+                    
+                    if (navigator.vibrate) {
+                        navigator.vibrate(0);
+                    }
+                    
+                    showNotification("Alarma desactivada", "verde");
                 }
-                
-                // Mostrar notificación
-                showNotification("Botón de pánico activado", "rojo");
-            }
-        }
-        
-        // Cerrar modal
-        function closeModal() {
-            emergencyActive = false;
-            document.getElementById('emergencyModal').classList.remove('active');
-        }
-        
-        // Enviar alerta
-        function sendAlert(type) {
-            let message = "";
-            let sound = document.getElementById('alarmSound');
-            
-            switch(type) {
-                case 'police':
-                    message = "Alerta enviada a la Policía Universitaria de la Universidad El Bosque con tu ubicación actual";
-                    break;
-                case 'medical':
-                    message = "Emergencia médica reportada al servicio de salud del campus. ¡Ayuda en camino!";
-                    break;
-                case 'contacts':
-                    message = "Tus contactos de emergencia han sido notificados con tu ubicación: Calle 134 #12B-25";
-                    break;
-            }
-            
-            alert(message);
-            sound.play();
-            
-            // Mostrar notificación
-            showNotification("Ayuda en camino", "verde");
-            
-            // Cerrar modal después de 2 segundos
-            setTimeout(() => {
-                closeModal();
-            }, 2000);
+            });
         }
         
         // Mostrar notificación
         function showNotification(text, type) {
-            let notification = document.getElementById('notification');
+            const notification = document.getElementById('notification');
             notification.textContent = text;
-            
-            if (type === "rojo") {
-                notification.style.background = "var(--rojo-emergencia)";
-            } else {
-                notification.style.background = "var(--verde-bosque)";
-            }
-            
+            notification.style.background = type === "rojo" ? "var(--rojo-emergencia)" : "var(--verde-bosque)";
             notification.style.display = "block";
             
             setTimeout(() => {
@@ -938,26 +650,31 @@
             }, 5000);
         }
         
-        // Abrir modales específicos
-        function openModal(type) {
-            let message = "";
+        // Mostrar página específica
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
             
-            switch(type) {
-                case 'security':
-                    message = "Conectando con seguridad universitaria...";
-                    break;
-                case 'medical':
-                    message = "Contactando servicio médico...";
-                    break;
-                case 'contacts':
-                    message = "Cargando tus contactos de emergencia...";
-                    break;
-                case 'map':
-                    message = "Abriendo mapa del campus...";
-                    break;
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            event.preventDefault();
+            
+            // Ajustar mapa si es la página de inicio
+            if (pageId === 'homePage' && map) {
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 300);
             }
-            
-            alert(message);
+        }
+        
+        // Función para abrir modales
+        function openModal(type) {
+            alert(`Función de ${type} activada`);
         }
     </script>
 </body>
