@@ -321,12 +321,25 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
         }
+        
+        /* Botón de logout */
+        .logout-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Header -->
     <div class="header">
+        <button class="logout-btn" onclick="logout()">👋</button>
         <div class="logo">
             <div class="logo-icon">UEB</div>
             <h2>UniSegura - El Bosque</h2>
@@ -784,6 +797,13 @@
                 setTimeout(() => {
                     map.invalidateSize();
                 }, 300);
+            }
+        }
+        
+        // Cerrar sesión
+        function logout() {
+            if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
+                window.location.href = "index.html";
             }
         }
     </script>
