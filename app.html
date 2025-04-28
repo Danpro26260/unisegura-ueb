@@ -10,9 +10,10 @@
             --verde-bosque: #2E8B57;
             --verde-claro: #3CB371;
             --blanco: #FFFFFF;
-            --rojo-emergencia: #FF0000;
             --gris-oscuro: #36454F;
             --gris-claro: #F5F5F5;
+            --rojo-emergencia: #FF4444;
+            --naranja-alerta: #FF6B6B;
         }
         
         * {
@@ -83,7 +84,7 @@
             to { opacity: 1; }
         }
         
-        /* Mapa compacto */
+        /* Mapa */
         .map-container {
             position: relative;
             margin-bottom: 1rem;
@@ -307,6 +308,10 @@
             animation: slideIn 0.3s forwards;
         }
         
+        .notification.emergency {
+            background: var(--rojo-emergencia);
+        }
+        
         @keyframes slideIn {
             from { top: 50px; opacity: 0; }
             to { top: 70px; opacity: 1; }
@@ -333,6 +338,108 @@
             font-size: 1.2rem;
             cursor: pointer;
         }
+        
+        /* Botones de acción */
+        .action-btn {
+            background: var(--verde-bosque);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 0.5rem 0;
+            width: 100%;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: var(--verde-claro);
+        }
+        
+        .action-btn.medical {
+            background: var(--naranja-alerta);
+        }
+        
+        /* Primeros auxilios */
+        .first-aid-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .first-aid-btn {
+            background: var(--naranja-alerta);
+            color: white;
+            border: none;
+            padding: 0.6rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        /* Lugares cercanos */
+        .location-tag {
+            display: inline-block;
+            background: var(--verde-claro);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+            cursor: pointer;
+        }
+        
+        .location-tag:hover {
+            background: var(--verde-bosque);
+        }
+        
+        .lugares-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+        
+        /* Activación discreta */
+        .gesture-info {
+            position: fixed;
+            bottom: 180px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 999;
+            display: none;
+        }
+        
+        /* Modo emergencia */
+        body.emergency-mode {
+            animation: blinkBackground 1s infinite;
+        }
+        
+        @keyframes blinkBackground {
+            0%, 100% { background-color: var(--gris-claro); }
+            50% { background-color: #ffdddd; }
+        }
+        
+        /* Zonas peligrosas */
+        .danger-zone-warning {
+            position: fixed;
+            top: 70px;
+            left: 20px;
+            right: 20px;
+            background: var(--rojo-emergencia);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s forwards;
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -354,6 +461,7 @@
             <div class="card">
                 <div class="card-title">Sistema de Seguridad Activo</div>
                 <p>Conectado a la red de la Universidad El Bosque</p>
+                <div class="location-status" id="locationStatus"></div>
             </div>
             
             <div class="map-container">
@@ -362,8 +470,29 @@
             </div>
             
             <div class="card">
+                <div class="card-title">Lugares cercanos</div>
+                <div class="lugares-container">
+                    <span class="location-tag" onclick="mostrarEnMapa('cueva')">La Cueva</span>
+                    <span class="location-tag" onclick="mostrarEnMapa('cancha futbol')">Cancha Fútbol</span>
+                    <span class="location-tag" onclick="mostrarEnMapa('cancha voleybol')">Cancha Voleybol</span>
+                    <span class="location-tag" onclick="mostrarEnMapa('cafeteria oma')">Cafetería Oma</span>
+                    <span class="location-tag" onclick="mostrarEnMapa('sede hub')">Sede Hub</span>
+                    <span class="location-tag" onclick="mostrarEnMapa('jumbo 134')">Jumbo 134</span>
+                    <span class="location-tag" onclick="mostrarEnMapa('exito wow 134')">Éxito Wow 134</span>
+                    <span class="location-tag" onclick="mostrarEnMapa('hospital los cobos')">Hospital Los Cobos</span>
+                    <span class="location-tag" onclick="mostrarEnMapa('novena y septima')">Novena y Septima</span>
+                </div>
+            </div>
+            
+            <div class="card">
                 <div class="card-title">Acciones rápidas</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <button class="action-btn" onclick="solicitarAcompanamiento()">
+                    🚶‍♂️ Solicitar acompañamiento seguro
+                </button>
+                <button class="action-btn medical" onclick="showPage('firstAidPage')">
+                    🚑 Primeros Auxilios con IA
+                </button>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                     <button style="padding: 0.8rem; background: var(--blanco); border: none; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" onclick="showPage('chatPage')">
                         <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">🛡️</div>
                         <div>Chat Seguridad</div>
@@ -387,14 +516,6 @@
                         <div>Hola, soy el Oficial Martínez. ¿En qué puedo ayudarte?</div>
                         <div class="message-time">10:24 AM</div>
                     </div>
-                    <div class="message sent">
-                        <div>Hay una persona sospechosa en la biblioteca</div>
-                        <div class="message-time">10:25 AM</div>
-                    </div>
-                    <div class="message received">
-                        <div>Gracias por reportar. ¿Puedes describir a la persona?</div>
-                        <div class="message-time">10:26 AM</div>
-                    </div>
                 </div>
                 <div class="chat-input">
                     <input type="text" id="messageInput" placeholder="Escribe tu mensaje..." onkeypress="handleKeyPress(event)">
@@ -412,9 +533,27 @@
                         <option value="">Tipo de incidente</option>
                         <option value="robo">Robo</option>
                         <option value="sospechoso">Persona sospechosa</option>
+                        <option value="acoso">Acoso</option>
                         <option value="accidente">Accidente</option>
                         <option value="medica">Emergencia médica</option>
                     </select>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">Lugar del incidente:</div>
+                        <div class="lugares-container">
+                            <span class="location-tag" onclick="seleccionarLugar('cueva')">La Cueva</span>
+                            <span class="location-tag" onclick="seleccionarLugar('cancha futbol')">Cancha Fútbol</span>
+                            <span class="location-tag" onclick="seleccionarLugar('cancha voleybol')">Cancha Voleybol</span>
+                            <span class="location-tag" onclick="seleccionarLugar('cafeteria oma')">Cafetería Oma</span>
+                            <span class="location-tag" onclick="seleccionarLugar('sede hub')">Sede Hub</span>
+                            <span class="location-tag" onclick="seleccionarLugar('jumbo 134')">Jumbo 134</span>
+                            <span class="location-tag" onclick="seleccionarLugar('exito wow 134')">Éxito Wow 134</span>
+                            <span class="location-tag" onclick="seleccionarLugar('hospital los cobos')">Hospital Los Cobos</span>
+                            <span class="location-tag" onclick="seleccionarLugar('novena y septima')">Novena y Septima</span>
+                        </div>
+                        <input type="text" id="incidentLocation" placeholder="O especifica otro lugar" style="width: 100%; padding: 0.8rem; border-radius: 10px; border: 1px solid #ddd; margin-top: 0.5rem;">
+                    </div>
+                    
                     <textarea id="incidentDescription" style="width: 100%; padding: 0.8rem; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 1rem;" placeholder="Descripción del incidente"></textarea>
                     <button onclick="submitReport()" style="width: 100%; padding: 1rem; background: var(--verde-bosque); color: white; border: none; border-radius: 10px;">Enviar Reporte</button>
                 </div>
@@ -428,131 +567,220 @@
             </div>
         </div>
         
+        <!-- Página de Primeros Auxilios -->
+        <div id="firstAidPage" class="page">
+            <div class="chat-container">
+                <div class="chat-header">
+                    Asistente de Primeros Auxilios
+                </div>
+                <div class="chat-messages" id="firstAidChat">
+                    <div class="message received">
+                        <div>Hola, soy tu asistente de emergencias. Selecciona una opción:</div>
+                    </div>
+                </div>
+                <div class="first-aid-options">
+                    <button class="first-aid-btn" onclick="sendFirstAidQuery('quemadura')">Quemadura</button>
+                    <button class="first-aid-btn" onclick="sendFirstAidQuery('herida')">Herida</button>
+                    <button class="first-aid-btn" onclick="sendFirstAidQuery('atragantamiento')">Atragantamiento</button>
+                    <button class="first-aid-btn" onclick="sendFirstAidQuery('desmayo')">Desmayo</button>
+                    <button class="first-aid-btn" onclick="sendFirstAidQuery('fractura')">Fractura</button>
+                    <button class="first-aid-btn" onclick="sendFirstAidQuery('hemorragia')">Hemorragia</button>
+                </div>
+            </div>
+        </div>
+        
         <!-- Página de Perfil -->
         <div id="profilePage" class="page">
             <div style="text-align: center; margin-bottom: 1.5rem;">
                 <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--verde-bosque); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1rem;">JP</div>
                 <h3>Juan Pérez</h3>
                 <p>Estudiante de Medicina</p>
+                <div style="margin: 10px 0; color: var(--verde-bosque);">
+                    ⭐ 4.8 (Usuario Verificado)
+                </div>
             </div>
             
             <div class="card">
-                <div style="margin-bottom: 1rem;">
-                    <div style="font-size: 0.8rem; color: #777;">Matrícula</div>
-                    <div style="font-weight: 500;">20231045</div>
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <div style="font-size: 0.8rem; color: #777;">Correo</div>
-                    <div style="font-weight: 500;">j.perez@unbosque.edu.co</div>
-                </div>
-                <div>
-                    <div style="font-size: 0.8rem; color: #777;">Teléfono</div>
-                    <div style="font-weight: 500;">+57 310 123 4567</div>
+                <div class="card-title">Información Personal</div>
+                <div style="margin-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                        <span style="color: #777;">Tipo de sangre:</span>
+                        <span>O+</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                        <span style="color: #777;">Alergias:</span>
+                        <span>Ninguna registrada</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #777;">Seguro médico:</span>
+                        <span>Famisanar</span>
+                    </div>
                 </div>
             </div>
             
             <div class="card">
                 <div class="card-title">Contactos de Emergencia</div>
                 <div style="margin-top: 1rem;">
-                    <div style="padding: 1rem; border-bottom: 1px solid #eee;">
-                        <div style="font-weight: 500;">María Gómez</div>
-                        <div style="font-size: 0.8rem; color: #777;">Madre - 555 123 4567</div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                        <span>María Gómez (Madre)</span>
+                        <button style="background: var(--verde-bosque); color: white; border: none; border-radius: 5px; padding: 0.3rem 0.6rem; font-size: 0.8rem;">Llamar</button>
                     </div>
-                    <div style="padding: 1rem; border-bottom: 1px solid #eee;">
-                        <div style="font-weight: 500;">Carlos Pérez</div>
-                        <div style="font-size: 0.8rem; color: #777;">Padre - 555 765 4321</div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                        <span>Carlos Pérez (Padre)</span>
+                        <button style="background: var(--verde-bosque); color: white; border: none; border-radius: 5px; padding: 0.3rem 0.6rem; font-size: 0.8rem;">Llamar</button>
                     </div>
-                    <div style="padding: 1rem;">
-                        <div style="font-weight: 500;">Seguridad UEB</div>
-                        <div style="font-size: 0.8rem; color: #777;">555 987 6543</div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Seguridad UEB</span>
+                        <button style="background: var(--rojo-emergencia); color: white; border: none; border-radius: 5px; padding: 0.3rem 0.6rem; font-size: 0.8rem;">Emergencia</button>
                     </div>
                 </div>
             </div>
+            
+            <div class="card">
+                <div class="card-title">Configuración de Seguridad</div>
+                <div style="margin-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                        <span>Notificaciones de zonas peligrosas</span>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                        <span>Compartir ubicación en emergencias</span>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Modo nocturno automático</span>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="logout()" style="width: 100%; padding: 1rem; background: #f0f0f0; color: #ff4444; border: none; border-radius: 10px; margin-top: 1rem;">Cerrar Sesión</button>
         </div>
     </div>
     
-    <!-- Botón de pánico -->
+    <!-- Botón de pánico flotante -->
     <div class="panic-btn-container">
-        <button id="panicButton" class="panic-btn">🚨</button>
+        <button id="panicButton" class="panic-btn">SOS</button>
     </div>
+    
+    <!-- Información de gestos de emergencia -->
+    <div class="gesture-info" id="gestureInfo">
+        <strong>Activación discreta:</strong><br>
+        - Agitar el teléfono<br>
+        - Presionar 3 veces volumen<br>
+        - Comando de voz "Ayuda UEB"
+    </div>
+    
+    <!-- Advertencia de zona peligrosa -->
+    <div class="danger-zone-warning" id="dangerZoneWarning">
+        ⚠️ Estás ingresando a una zona de alto riesgo. Recomendamos tomar una ruta alternativa.
+    </div>
+    
+    <!-- Notificación flotante -->
+    <div id="notification" class="notification"></div>
     
     <!-- Barra de navegación -->
     <div class="nav-bar">
         <a href="#" class="nav-item active" onclick="showPage('homePage')">
-            <span class="nav-icon">🏠</span>
-            <span>Inicio</span>
+            <div class="nav-icon">🏠</div>
+            <div>Inicio</div>
         </a>
         <a href="#" class="nav-item" onclick="showPage('chatPage')">
-            <span class="nav-icon">💬</span>
-            <span>Chat</span>
+            <div class="nav-icon">💬</div>
+            <div>Chat</div>
         </a>
         <a href="#" class="nav-item" onclick="showPage('reportsPage')">
-            <span class="nav-icon">📝</span>
-            <span>Reportes</span>
+            <div class="nav-icon">📝</div>
+            <div>Reportes</div>
         </a>
         <a href="#" class="nav-item" onclick="showPage('profilePage')">
-            <span class="nav-icon">👤</span>
-            <span>Perfil</span>
+            <div class="nav-icon">👤</div>
+            <div>Perfil</div>
         </a>
     </div>
-    
-    <!-- Notificación -->
-    <div id="notification" class="notification">
-        ¡Alerta recibida en tu zona!
-    </div>
-    
-    <!-- Audio de sirena (usando Howler.js) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
-    <!-- Leaflet JS para el mapa -->
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
     <script>
         // Variables globales
         let emergencyActive = false;
         let map;
         let userMarker;
+        let watchId;
+        let volumePressCount = 0;
+        let lastShakeTime = 0;
+        let isInDangerZone = false;
+        
+        // Lugares cercanos
+        const lugaresCercanos = {
+            'cueva': { coords: [4.6840, -74.0655], nombre: "La Cueva", direccion: "Cafetería principal", icono: "☕" },
+            'cancha futbol': { coords: [4.6838, -74.0640], nombre: "Cancha de Fútbol", direccion: "Zona deportiva", icono: "⚽" },
+            'cancha voleybol': { coords: [4.6835, -74.0642], nombre: "Cancha de Voleibol", direccion: "Zona deportiva", icono: "🏐" },
+            'cafeteria oma': { coords: [4.6842, -74.0640], nombre: "Cafetería Oma", direccion: "Edificio administrativo", icono: "🍴" },
+            'sede hub': { coords: [4.6845, -74.0635], nombre: "Sede Hub", direccion: "Innovación y emprendimiento", icono: "💡" },
+            'jumbo 134': { coords: [4.6850, -74.0660], nombre: "Jumbo 134", direccion: "Calle 134 # 7-10", icono: "🛒" },
+            'exito wow 134': { coords: [4.6855, -74.0665], nombre: "Éxito Wow 134", direccion: "Calle 134 # 7-20", icono: "🛍️" },
+            'hospital los cobos': { coords: [4.6860, -74.0670], nombre: "Hospital Los Cobos", direccion: "Calle 134 # 11-40", icono: "🏥" },
+            'novena y septima': { coords: [4.6830, -74.0630], nombre: "Novena y Séptima", direccion: "Zona comercial", icono: "🛣️" }
+        };
+        
+        // Reportes de ejemplo
         let reports = [
             {
                 id: 1,
-                type: "robo",
-                description: "Robo de celular en la biblioteca",
+                type: "sospechoso",
                 location: "Biblioteca Central",
-                date: "15/03/2023 14:30",
+                description: "Persona sospechosa merodeando en el segundo piso",
+                date: "15/05/2023 18:30",
                 status: "en_revision"
             },
             {
                 id: 2,
-                type: "sospechoso",
-                description: "Persona merodeando en estacionamiento",
-                location: "Estacionamiento Norte",
-                date: "10/03/2023 08:45",
+                type: "robo",
+                location: "Parqueadero norte",
+                description: "Robo de bicicleta cerca de la entrada",
+                date: "10/05/2023 14:15",
                 status: "resuelto"
             }
         ];
         
-        // Configurar sirena con Howler
-        const sirenSound = new Howl({
-            src: ['https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3'],
-            loop: true,
-            volume: 0.8
-        });
-        
-        // Inicializar la aplicación
+        // Inicializar la aplicación cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', function() {
             initMap();
             setupPanicButton();
             loadReports();
+            setupEmergencyGestures();
+            startVoiceRecognition();
             
-            // Mostrar notificación de prueba
+            // Mostrar instrucciones de gestos al inicio
             setTimeout(() => {
-                showNotification("Bienvenido a UniSegura", "verde");
-            }, 2000);
+                document.getElementById('gestureInfo').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('gestureInfo').style.display = 'none';
+                }, 10000);
+            }, 3000);
+            
+            // Mostrar notificación de bienvenida
+            showNotification("Bienvenido a UniSegura", "verde");
         });
         
-        // Inicializar mapa
+        // ====================
+        // FUNCIONES DEL MAPA
+        // ====================
+        
         function initMap() {
+            // Crear mapa centrado en la universidad
             map = L.map('campusMap').setView([4.6843, -74.0648], 16);
             
+            // Añadir capa de OpenStreetMap
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
@@ -567,82 +795,130 @@
             }).addTo(map).bindPopup("Universidad El Bosque");
             
             // Marcador del usuario
-            userMarker = L.marker([4.6835, -74.0635], {
+            userMarker = L.marker([4.6843, -74.0648], {
                 icon: L.divIcon({
                     className: 'user-marker',
                     html: '📍',
                     iconSize: [25, 25]
                 })
-            }).addTo(map).bindPopup("Tu ubicación aproximada");
+            }).addTo(map).bindPopup("Tu ubicación");
             
-            // Puntos de seguridad
-            addSecurityPoints();
-        }
-        
-        // Añadir puntos de seguridad
-        function addSecurityPoints() {
-            const points = [
-                { coords: [4.6845, -74.0650], title: "Puesto de Seguridad UEB", type: "security" },
-                { coords: [4.6830, -74.0630], title: "CAI Calle 134", type: "police" },
-                { coords: [4.6820, -74.0620], title: "Zona de riesgo", type: "danger" }
-            ];
-            
-            points.forEach(point => {
-                let icon;
-                if (point.type === "security") {
-                    icon = L.divIcon({ html: '🛡️', iconSize: [25, 25] });
-                } else if (point.type === "police") {
-                    icon = L.divIcon({ html: '🚔', iconSize: [25, 25] });
-                } else {
-                    icon = L.divIcon({ html: '⚠️', iconSize: [25, 25] });
-                }
-                
-                L.marker(point.coords, { icon: icon })
-                    .addTo(map)
-                    .bindPopup(point.title);
+            // Añadir lugares cercanos al mapa
+            Object.keys(lugaresCercanos).forEach(key => {
+                const lugar = lugaresCercanos[key];
+                L.marker(lugar.coords, {
+                    icon: L.divIcon({ html: lugar.icono, iconSize: [25, 25] })
+                }).addTo(map).bindPopup(`<b>${lugar.nombre}</b><br>${lugar.direccion}`);
             });
+            
+            // Añadir zonas peligrosas
+            addDangerZones();
+            
+            // Iniciar seguimiento de ubicación
+            startTracking();
         }
         
-        // Configurar botón de pánico
+        function addDangerZones() {
+            // Zona de ejemplo con alto índice de robos
+            const dangerZone = L.polygon([
+                [4.6835, -74.0655],
+                [4.6835, -74.0645],
+                [4.6845, -74.0645],
+                [4.6845, -74.0655]
+            ], {
+                color: '#ff0000',
+                fillOpacity: 0.2
+            }).addTo(map).bindPopup("Zona de alto riesgo - Evitar sola/o de noche");
+            
+            // Verificar si usuario entra en zona peligrosa
+            setInterval(() => {
+                if (userMarker) {
+                    const userPos = userMarker.getLatLng();
+                    if (dangerZone.getBounds().contains(userPos) {
+                        if (!isInDangerZone) {
+                            showDangerZoneWarning();
+                            isInDangerZone = true;
+                        }
+                    } else {
+                        isInDangerZone = false;
+                    }
+                }
+            }, 30000);
+        }
+        
+        function showDangerZoneWarning() {
+            const warning = document.getElementById('dangerZoneWarning');
+            warning.style.display = 'block';
+            
+            setTimeout(() => {
+                warning.style.display = 'none';
+            }, 10000);
+            
+            // Mostrar en el chat automáticamente
+            addMessage(
+                "Sistema", 
+                "⚠️ Has ingresado a una zona peligrosa. ¿Necesitas ayuda?", 
+                "received", 
+                "chatMessages"
+            );
+        }
+        
+        function startTracking() {
+            if (navigator.geolocation) {
+                watchId = navigator.geolocation.watchPosition(
+                    (position) => {
+                        const userLatLng = [position.coords.latitude, position.coords.longitude];
+                        userMarker.setLatLng(userLatLng);
+                        map.panTo(userLatLng);
+                        document.getElementById('locationStatus').textContent = 
+                            `Ubicación actualizada: ${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`;
+                    },
+                    (error) => {
+                        console.error("Error en geolocalización:", error);
+                        document.getElementById('locationStatus').textContent = 
+                            "Error: Activa la ubicación para mejores resultados";
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                document.getElementById('locationStatus').textContent = 
+                    "Geolocalización no soportada por tu navegador";
+            }
+        }
+        
+        function mostrarEnMapa(lugarKey) {
+            const lugar = lugaresCercanos[lugarKey];
+            if (lugar) {
+                map.setView(lugar.coords, 18);
+                showNotification(`Mostrando ${lugar.nombre} en el mapa`, "verde");
+            }
+        }
+        
+        function seleccionarLugar(lugarKey) {
+            const lugar = lugaresCercanos[lugarKey];
+            if (lugar) {
+                document.getElementById('incidentLocation').value = lugar.nombre;
+                showNotification(`Lugar seleccionado: ${lugar.nombre}`, "verde");
+            }
+        }
+        
+        // ====================
+        // FUNCIONES DE EMERGENCIA
+        // ====================
+        
         function setupPanicButton() {
             const panicButton = document.getElementById('panicButton');
             
             panicButton.addEventListener('click', function() {
                 if (!emergencyActive) {
                     if (confirm("¿Estás seguro que quieres activar la alarma de emergencia?")) {
-                        emergencyActive = true;
-                        panicButton.classList.add('active');
-                        sirenSound.play();
-                        
-                        // Vibrar en dispositivos móviles
-                        if (navigator.vibrate) {
-                            navigator.vibrate([500, 200, 500, 200, 500]);
-                        }
-                        
-                        // Mostrar alerta
-                        showNotification("¡ALERTA DE EMERGENCIA ACTIVADA!", "rojo");
-                        alert("¡Se ha activado la alarma! Seguridad ha sido notificada");
-                        
-                        // Notificar al chat automáticamente
-                        addMessage("Sistema", "Alerta de emergencia activada desde tu ubicación", "received");
-                        
-                        // Crear reporte automático
-                        const newReport = {
-                            id: reports.length + 1,
-                            type: "emergencia",
-                            description: "Botón de pánico activado",
-                            location: "Ubicación del usuario",
-                            date: new Date().toLocaleString(),
-                            status: "en_revision"
-                        };
-                        reports.unshift(newReport);
-                        loadReports();
+                        activateEmergency();
                     }
                 } else {
                     // Desactivar emergencia
                     emergencyActive = false;
                     panicButton.classList.remove('active');
-                    sirenSound.stop();
+                    document.body.classList.remove('emergency-mode');
                     
                     if (navigator.vibrate) {
                         navigator.vibrate(0);
@@ -653,11 +929,143 @@
             });
         }
         
-        // Funciones del chat
+        function setupEmergencyGestures() {
+            // 1. Detección de movimiento (agitar)
+            window.addEventListener('devicemotion', (e) => {
+                const acceleration = e.accelerationIncludingGravity;
+                const shakeThreshold = 15;
+                
+                if (Math.abs(acceleration.x) > shakeThreshold || 
+                    Math.abs(acceleration.y) > shakeThreshold || 
+                    Math.abs(acceleration.z) > shakeThreshold) {
+                    
+                    const now = Date.now();
+                    if (now - lastShakeTime > 2000) { // Evitar activaciones múltiples
+                        lastShakeTime = now;
+                        activateEmergency(true); // Modo silencioso
+                    }
+                }
+            });
+            
+            // 2. Botones de volumen
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'VolumeDown' || e.code === 'VolumeUp') {
+                    volumePressCount++;
+                    
+                    if (volumePressCount >= 3) {
+                        activateEmergency(true); // Modo silencioso
+                        volumePressCount = 0;
+                    }
+                    
+                    setTimeout(() => { volumePressCount = 0; }, 2000);
+                }
+            });
+        }
+        
+        function startVoiceRecognition() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'es-ES';
+            recognition.onresult = (e) => {
+                const transcript = e.results[0][0].transcript.toLowerCase();
+                if (transcript.includes('ayuda ueb') || transcript.includes('emergencia')) {
+                    activateEmergency(true);
+                }
+            };
+            
+            recognition.onerror = (e) => {
+                console.log("Error en reconocimiento de voz:", e.error);
+            };
+            
+            try {
+                recognition.start();
+                setTimeout(startVoiceRecognition, 5000); // Reiniciar cada 5 segundos
+            } catch (e) {
+                console.log("Error al iniciar reconocimiento de voz:", e);
+            }
+        }
+        
+        function activateEmergency(silent = false) {
+            if (emergencyActive) return;
+            
+            emergencyActive = true;
+            document.body.classList.add('emergency-mode');
+            
+            // Obtener ubicación actual
+            const userLocation = userMarker.getLatLng();
+            
+            // Enviar alerta a seguridad
+            sendEmergencyAlert(userLocation, silent);
+            
+            // Mostrar feedback al usuario
+            if (!silent) {
+                document.getElementById('panicButton').classList.add('active');
+                navigator.vibrate([500, 200, 500]);
+                showNotification("¡ALERTA ENVIADA A SEGURIDAD!", "rojo");
+            } else {
+                showNotification("Alerta silenciosa activada", "verde");
+                navigator.vibrate([200, 100, 200]);
+            }
+            
+            // Registrar en el historial
+            addEmergencyReport(userLocation);
+            
+            // Mostrar en el chat
+            addMessage(
+                "Sistema", 
+                silent ? "Alerta silenciosa activada" : "¡EMERGENCIA ACTIVADA!", 
+                "received", 
+                "chatMessages"
+            );
+        }
+        
+        function sendEmergencyAlert(location, isSilent) {
+            // Simular envío al servidor
+            console.log(`Alerta enviada a seguridad - Ubicación: ${location.lat}, ${location.lng} - Silencioso: ${isSilent}`);
+            
+            // Simular respuesta de seguridad
+            setTimeout(() => {
+                if (isSilent) {
+                    // Mensaje discreto para verificar estado
+                    addMessage(
+                        "Seguridad UEB", 
+                        "Hemos recibido tu alerta. Responde 'OK' si estás bien o necesitas ayuda.", 
+                        "received", 
+                        "chatMessages"
+                    );
+                } else {
+                    // Respuesta inmediata para emergencia activa
+                    addMessage(
+                        "Seguridad UEB", 
+                        "¡Equipo en camino! Mantén la calma. Llegaremos en aprox. 2 minutos.", 
+                        "received", 
+                        "chatMessages"
+                    );
+                }
+            }, 3000);
+        }
+        
+        function addEmergencyReport(location) {
+            const newReport = {
+                id: reports.length + 1,
+                type: "emergencia",
+                location: `Ubicación: ${location.lat.toFixed(5)}, ${location.lng.toFixed(5)}`,
+                description: emergencyActive ? "Botón de pánico activado" : "Alerta silenciosa activada",
+                date: new Date().toLocaleString(),
+                status: "en_revision"
+            };
+            
+            reports.unshift(newReport);
+            loadReports();
+        }
+        
+        // ====================
+        // FUNCIONES DEL CHAT
+        // ====================
+        
         function sendMessage() {
             const input = document.getElementById('messageInput');
             if (input.value.trim() !== "") {
-                addMessage("Tú", input.value, "sent");
+                addMessage("Tú", input.value, "sent", "chatMessages");
                 input.value = "";
                 
                 // Simular respuesta después de 1-3 segundos
@@ -671,7 +1079,7 @@
                         "¿La persona aún está allí?"
                     ];
                     const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                    addMessage("Oficial Martínez", randomResponse, "received");
+                    addMessage("Oficial Martínez", randomResponse, "received", "chatMessages");
                 }, 1000 + Math.random() * 2000);
             }
         }
@@ -682,8 +1090,8 @@
             }
         }
         
-        function addMessage(sender, text, type) {
-            const chat = document.getElementById('chatMessages');
+        function addMessage(sender, text, type, containerId) {
+            const chat = document.getElementById(containerId);
             const now = new Date();
             const timeString = now.getHours() + ":" + (now.getMinutes() < 10 ? "0" : "") + now.getMinutes();
             
@@ -698,28 +1106,25 @@
             chat.scrollTop = chat.scrollHeight;
         }
         
-        // Funciones de reportes
+        // ====================
+        // FUNCIONES DE REPORTES
+        // ====================
+        
         function submitReport() {
             const type = document.getElementById('incidentType').value;
+            const location = document.getElementById('incidentLocation').value;
             const description = document.getElementById('incidentDescription').value;
             
-            if (!type || !description) {
+            if (!type || !location || !description) {
                 alert("Por favor completa todos los campos");
                 return;
             }
             
-            const typeText = {
-                'robo': 'Robo',
-                'sospechoso': 'Persona sospechosa',
-                'accidente': 'Accidente',
-                'medica': 'Emergencia médica'
-            }[type];
-            
             const newReport = {
                 id: reports.length + 1,
                 type: type,
+                location: location,
                 description: description,
-                location: "Campus Principal",
                 date: new Date().toLocaleString(),
                 status: "en_revision"
             };
@@ -729,13 +1134,11 @@
             
             // Limpiar formulario
             document.getElementById('incidentType').value = "";
+            document.getElementById('incidentLocation').value = "";
             document.getElementById('incidentDescription').value = "";
             
-            // Mostrar confirmación
             showNotification("Reporte enviado con éxito", "verde");
-            
-            // Notificar al chat
-            addMessage("Sistema", `Nuevo reporte de ${typeText}: ${description}`, "received");
+            addMessage("Sistema", `Nuevo reporte en ${location}: ${description}`, "received", "chatMessages");
         }
         
         function loadReports() {
@@ -766,19 +1169,47 @@
             });
         }
         
-        // Mostrar notificación
-        function showNotification(text, type) {
-            const notification = document.getElementById('notification');
-            notification.textContent = text;
-            notification.style.background = type === "rojo" ? "var(--rojo-emergencia)" : "var(--verde-bosque)";
-            notification.style.display = "block";
+        // ====================
+        // FUNCIONES DE PRIMEROS AUXILIOS
+        // ====================
+        
+        function sendFirstAidQuery(emergencyType) {
+            const chat = document.getElementById('firstAidChat');
             
+            // Mensaje del usuario
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message sent';
+            userMsg.innerHTML = `<div>${emergencyType}</div>`;
+            chat.appendChild(userMsg);
+            
+            // Respuesta de IA
             setTimeout(() => {
-                notification.style.display = "none";
-            }, 5000);
+                const response = getFirstAidResponse(emergencyType);
+                const botMsg = document.createElement('div');
+                botMsg.className = 'message received';
+                botMsg.innerHTML = `<div>${response}</div>`;
+                chat.appendChild(botMsg);
+                chat.scrollTop = chat.scrollHeight;
+            }, 1000);
         }
         
-        // Mostrar página específica
+        function getFirstAidResponse(emergencyType) {
+            const responses = {
+                "quemadura": "1️⃣ Enfría con agua corriente 20 min\n2️⃣ No uses hielo ni cremas\n3️⃣ Cubre con gasa estéril\n4️⃣ Si es grave, llama al 123",
+                "herida": "1️⃣ Limpia con agua y jabón\n2️⃣ Aplica presión para detener sangrado\n3️⃣ Usa gasa estéril\n4️⃣ Si es profunda, busca atención médica",
+                "atragantamiento": "1️⃣ Pide que tosa con fuerza\n2️⃣ Aplica 5 palmadas interescapulares\n3️⃣ Realiza la maniobra de Heimlich\n4️⃣ Si pierde conciencia, inicia RCP",
+                "desmayo": "1️⃣ Acuesta a la persona\n2️⃣ Eleva sus piernas 30 cm\n3️⃣ Afloja ropa ajustada\n4️⃣ No le des comida/bebida\n5️⃣ Si no recupera conciencia en 1 min, llama al 123",
+                "fractura": "1️⃣ Inmoviliza el área afectada\n2️⃣ Aplica hielo envuelto en tela\n3️⃣ No trates de enderezar\n4️⃣ Busca atención médica inmediata",
+                "hemorragia": "1️⃣ Aplica presión directa\n2️⃣ Eleva la herida sobre el corazón\n3️⃣ Usa vendaje compresivo\n4️⃣ Si no cesa, llama al 123"
+            };
+            
+            return responses[emergencyType] || "Por favor describe la emergencia con más detalle";
+        }
+        
+        // ====================
+        // FUNCIONES GENERALES
+        // ====================
+        
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.remove('active');
@@ -788,9 +1219,9 @@
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
-            event.currentTarget.classList.add('active');
             
-            event.preventDefault();
+            // Marcar el ítem de navegación correspondiente como activo
+            document.querySelector(`.nav-item[onclick="showPage('${pageId}')"]`).classList.add('active');
             
             // Ajustar mapa si es la página de inicio
             if (pageId === 'homePage' && map) {
@@ -800,11 +1231,102 @@
             }
         }
         
-        // Cerrar sesión
+        function showNotification(text, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = text;
+            notification.className = type === "rojo" ? "notification emergency" : "notification";
+            notification.style.display = "block";
+            
+            setTimeout(() => {
+                notification.style.display = "none";
+            }, 5000);
+        }
+        
         function logout() {
             if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
                 window.location.href = "index.html";
             }
+        }
+        
+        function solicitarAcompanamiento() {
+            if (!navigator.geolocation) {
+                alert("No se puede obtener tu ubicación");
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition((position) => {
+                const destino = prompt("¿A qué lugar necesitas acompañamiento?\nEj: Jumbo 134, Hospital Los Cobos, etc.");
+                
+                if (destino) {
+                    const opcion = confirm("¿Quieres calcular la ruta segura o buscar acompañamiento grupal?");
+                    
+                    if (opcion) {
+                        // Opción de ruta segura
+                        calcularRutaSegura(destino);
+                    } else {
+                        // Opción de acompañamiento grupal
+                        buscarAcompanamientoGrupal(destino);
+                    }
+                }
+            });
+        }
+        
+        function calcularRutaSegura(destino) {
+            if (!navigator.geolocation) {
+                alert("Geolocalización no soportada");
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition((position) => {
+                const inicio = [position.coords.latitude, position.coords.longitude];
+                const destinoCoords = Object.values(lugaresCercanos).find(l => l.nombre.toLowerCase().includes(destino.toLowerCase()))?.coords;
+                
+                if (!destinoCoords) {
+                    alert("Destino no reconocido");
+                    return;
+                }
+
+                // Simulación de ruta (en un caso real usarías API de routing)
+                const ruta = L.polyline([inicio, destinoCoords], {
+                    color: '#2E8B57',
+                    weight: 5,
+                    opacity: 0.7
+                }).addTo(map);
+
+                // Marcador de destino
+                L.marker(destinoCoords, {
+                    icon: L.divIcon({
+                        html: '🏁',
+                        iconSize: [30, 30]
+                    })
+                }).addTo(map).bindPopup(`Destino: ${destino}`);
+
+                // Ajustar vista para mostrar toda la ruta
+                map.fitBounds(ruta.getBounds());
+
+                showNotification(`Ruta calculada a ${destino}`, "verde");
+            });
+        }
+        
+        function buscarAcompanamientoGrupal(destino) {
+            showNotification(`Buscando compañeros hacia ${destino}...`, "verde");
+            
+            // Simulación de búsqueda
+            setTimeout(() => {
+                const compañeros = ["Ana Gómez", "Carlos Pérez", "María Rodríguez"];
+                const mensaje = compañeros.length > 0 
+                    ? `Compañeros disponibles hacia ${destino}:\n${compañeros.join(", ")}\n¿Quieres unirte al grupo?`
+                    : "No hay compañeros disponibles ahora. ¿Quieres ser el primero?";
+                
+                if (confirm(mensaje)) {
+                    addMessage(
+                        "Sistema", 
+                        `Te has unido al grupo hacia ${destino}. Recibirás notificaciones cuando estén cerca.`, 
+                        "received",
+                        "chatMessages"
+                    );
+                }
+            }, 2000);
         }
     </script>
 </body>
